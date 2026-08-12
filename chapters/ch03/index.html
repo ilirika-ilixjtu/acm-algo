@@ -1,0 +1,626 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="description" content="算法竞赛入门 · 第3章《数组和字符串》交互式学习：一维数组、字符数组、字符串、黑盒测试与在线评测。"/>
+<meta content="#F2EFE9" name="theme-color"/>
+<meta content="dark light" name="color-scheme"/>
+<title>第3章 数组和字符串 · 算法竞赛入门交互课</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg"/>
+<link rel="stylesheet" href="../../assets/css/lesson.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css"/>
+<script>
+window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] } };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<div class="page-grid">
+<aside aria-label="课程导航" class="sidebar">
+<a class="back-link" href="../../index.html">← 返回章节总览</a>
+<div class="brand">
+<div class="brand-mark">AC</div>
+<div><strong>算法入门 Lab</strong><small>第3章 · 数组和字符串</small></div>
+</div>
+<div class="timer-card">
+<div class="timer-label">本章总计时</div>
+<div class="timer-display" id="timerDisplay">00:00:00</div>
+<div class="timer-actions">
+<button class="btn primary" id="timerStart">开始</button>
+<button class="btn" id="timerPause">暂停</button>
+<button class="btn ghost" id="timerReset">重置计时</button>
+</div>
+</div>
+<div class="progress-wrap">
+<div class="progress-row"><span>课程进度</span><span id="progressText">0 / 8</span></div>
+<div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+</div>
+<div class="nav-title">学习路线</div>
+<nav class="nav-list" id="sideNav">
+<a class="nav-link" href="#plan"><span class="nav-dot"></span>0. 本章路线</a>
+<a class="nav-link" href="#diagnosis"><span class="nav-dot"></span>1. 预诊断</a>
+<a class="nav-link" href="#array"><span class="nav-dot"></span>2. 一维数组</a>
+<a class="nav-link" href="#string"><span class="nav-dot"></span>3. 字符数组与字符串</a>
+<a class="nav-link" href="#contest"><span class="nav-dot"></span>4. 竞赛题目选讲</a>
+<a class="nav-link" href="#oj-note"><span class="nav-dot"></span>5. 黑盒测试与 OJ</a>
+<a class="nav-link" href="#practice"><span class="nav-dot"></span>6. 本章训练</a>
+<a class="nav-link" href="#finish"><span class="nav-dot"></span>7. 通关总结</a>
+</nav>
+<div class="side-tools">
+<button class="btn small" id="themeToggle">切换夜雾</button>
+<button class="btn small" id="exportBtn">导出记录</button>
+</div>
+</aside>
+<main>
+<div class="mobile-bar">
+<button class="btn small primary" id="mobileStart">开始</button>
+<span class="mobile-timer" id="mobileTimer">00:00:00</span>
+<button class="btn small" id="mobilePause">暂停</button>
+<button class="btn small" id="mobileTheme">主题</button>
+</div>
+<div class="content">
+<header class="hero">
+<div class="hero-copy">
+<span class="eyebrow">CHAPTER 3 · 语言篇</span>
+<h1>数组和字符串</h1>
+<p>第2章解决了「重复」，本章解决「<strong>记住一堆数据</strong>」：用数组存下一串数、用字符数组存下一句话。这是通往数据结构的第一级台阶。</p>
+<div class="hero-tags">
+<span class="tag">下标从 0 开始</span>
+<span class="tag">数组翻转可视化</span>
+<span class="tag">字符频率统计</span>
+<span class="tag">黑盒测试</span>
+<span class="tag">进度自动保存</span>
+</div>
+<div class="hero-actions">
+<a class="btn primary" href="#plan">开始本章学习</a>
+<button class="btn" onclick="document.getElementById('array').scrollIntoView()">直接进入核心知识</button>
+</div>
+</div>
+<div aria-label="数组示例" class="hero-visual">
+<div class="code-block" style="box-shadow:none;border:1px solid var(--line)">
+<div class="code-head"><span class="code-title">程序 3-1 · 读 n 个数并输出</span><span class="code-lang">C</span></div>
+<div class="code-body"><pre><code class="language-c">int a[100], n, i;
+scanf("%d", &amp;n);
+for (i = 0; i &lt; n; i++)
+  scanf("%d", &amp;a[i]);     /* 存进数组 */
+for (i = 0; i &lt; n; i++)
+  printf("%d ", a[i]);     /* 再取出来 */</code></pre></div>
+</div>
+</div>
+</header>
+
+<section class="lesson" data-section="plan" id="plan">
+<div class="section-top">
+<div>
+<p class="section-kicker">PLAN · 路线</p>
+<h2>本章怎么学</h2>
+<p class="lead">学完本章，你能用数组存下一批数据并处理（求最值、翻转、统计），会用字符数组处理字符串，并理解 OJ 的「黑盒测试」是怎么回事。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>五个学习目标</h3>
+<div class="grid-3">
+<div class="card"><div class="mini-title"><span class="icon">1</span>一维数组</div><p>会声明、读入、遍历数组，牢记<strong>下标从 0 开始</strong>。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">2</span>最值与统计</div><p>用循环求最大值、求和、统计出现次数。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">3</span>字符数组</div><p>理解字符串以 <code>\0</code> 结尾，会用 strlen、strcpy。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">4</span>字符串处理</div><p>能写回文判断、字符频率统计这类小程序。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">5</span>黑盒测试</div><p>理解 OJ 只比对输出，养成「精确输出」的习惯。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">6</span>越界意识</div><p>知道数组越界是未定义行为，写循环时反复检查边界。</p></div>
+</div>
+
+<h3>建议时间安排</h3>
+<div class="timeline">
+<div class="time-block"><b>0–10 分钟</b><strong>预诊断</strong><span>5 题摸清起点</span></div>
+<div class="time-block"><b>10–40 分钟</b><strong>一维数组</strong><span>下标、最值、翻转可视化</span></div>
+<div class="time-block"><b>40–70 分钟</b><strong>字符数组</strong><span>\\0、strlen、回文</span></div>
+<div class="time-block"><b>70–90 分钟</b><strong>竞赛选讲</strong><span>频率统计实战</span></div>
+<div class="time-block"><b>90–105 分钟</b><strong>黑盒测试</strong><span>理解 OJ 规则</span></div>
+<div class="time-block"><b>105–130 分钟</b><strong>训练 + 刷题</strong><span>3 道训练 + 错因记录</span></div>
+</div>
+
+<h3>学习主线</h3>
+<div class="method-flow">
+<div class="flow-node"><b>声明</b>int a[100]</div>
+<div class="flow-node"><b>读入</b>scanf 进循环</div>
+<div class="flow-node"><b>处理</b>遍历 + 条件</div>
+<div class="flow-node"><b>输出</b>严格按格式</div>
+</div>
+
+<div class="card warning">
+<div class="mini-title"><span class="icon">⚠</span>先记住一句话</div>
+<p><strong>数组下标从 0 开始，到 n-1 结束。</strong>循环里写 <code>i &lt;= n</code> 去访问 <code>a[i]</code> 是越界，编译器不拦你，后果却是未定义行为——这是竞赛新手翻车率最高的错误之一。</p>
+</div>
+</section>
+
+<section class="lesson" data-section="diagnosis" id="diagnosis">
+<div class="section-top">
+<div>
+<p class="section-kicker">DIAGNOSIS · 摸底</p>
+<h2>预诊断：先看你卡在哪里</h2>
+<p class="lead">共 5 题。凭直觉答完再看反馈。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="pre1">
+<div class="quiz-head"><strong>Q1｜数组下标范围</strong><span class="pill">下标</span></div>
+<div class="quiz-body">
+<p>声明 <code>int a[5];</code> 之后，合法的下标范围是：</p>
+<div class="options">
+<label class="option"><input name="pre1" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">1 到 5</span></span></label>
+<label class="option"><input name="pre1" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">0 到 4</span></span></label>
+<label class="option"><input name="pre1" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">0 到 5</span></span></label>
+<label class="option"><input name="pre1" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">1 到 4</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="pre2">
+<div class="quiz-head"><strong>Q2｜越界会怎样？</strong><span class="pill">越界</span></div>
+<div class="quiz-body">
+<p>访问不存在的 <code>a[5]</code>（数组大小是 5），会怎样？</p>
+<div class="options">
+<label class="option"><input name="pre2" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">编译器一定报错</span></span></label>
+<label class="option"><input name="pre2" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">未定义行为：可能崩溃，也可能悄悄出错</span></span></label>
+<label class="option"><input name="pre2" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">自动返回 0</span></span></label>
+<label class="option"><input name="pre2" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">自动扩展到 a[6]</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="pre3">
+<div class="quiz-head"><strong>Q3｜strlen("abc") 等于几？</strong><span class="pill">字符串</span></div>
+<div class="quiz-body">
+<p><code>strlen("abc")</code> 的返回值是：</p>
+<div class="options">
+<label class="option"><input name="pre3" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">4</span></span></label>
+<label class="option"><input name="pre3" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">3</span></span></label>
+<label class="option"><input name="pre3" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">2</span></span></label>
+<label class="option"><input name="pre3" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">编译错误</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="pre4">
+<div class="quiz-head"><strong>Q4｜scanf("%s") 能读到什么？</strong><span class="pill">输入</span></div>
+<div class="quiz-body">
+<p>输入 <code>hello world</code>，用 <code>scanf("%s", s);</code> 读，s 里是：</p>
+<div class="options">
+<label class="option"><input name="pre4" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer"><span class="mono">hello world</span></span></span></label>
+<label class="option"><input name="pre4" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer"><span class="mono">hello</span></span></span></label>
+<label class="option"><input name="pre4" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer"><span class="mono">world</span></span></span></label>
+<label class="option"><input name="pre4" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">什么都不读</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="A" data-quiz="pre5">
+<div class="quiz-head"><strong>Q5｜判断回文</strong><span class="pill">双指针</span></div>
+<div class="quiz-body">
+<p>判断字符串是否回文（正读反读一样），正确的思路是：</p>
+<div class="options">
+<label class="option"><input name="pre5" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">一个下标从头、一个从尾，向中间比较字符</span></span></label>
+<label class="option"><input name="pre5" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">只比较第一个和最后一个字符</span></span></label>
+<label class="option"><input name="pre5" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">比较字符串长度是否大于 1</span></span></label>
+<label class="option"><input name="pre5" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">用 strlen 判断</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="array" id="array">
+<div class="section-top">
+<div>
+<p class="section-kicker">3.1 · ARRAY</p>
+<h2>一维数组：把一堆数据存起来</h2>
+<p class="lead">循环解决「重复」，数组解决「记住」。数组就是一排连续编号的盒子。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. 声明与下标</h3>
+<p>声明 <code>int a[100];</code> 表示申请 100 个 int 盒子，编号（下标）是 <code>0</code> 到 <code>99</code>。<strong>没有 a[100]</strong>——这是最容易越界的地方。</p>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 3-2 · 读 n 个数，输出最大值</span><span class="code-lang">C</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-c">int a[100], n, i, max;
+scanf("%d", &amp;n);
+for (i = 0; i &lt; n; i++) scanf("%d", &amp;a[i]);
+
+max = a[0];                      /* 先假设第一个最大 */
+for (i = 1; i &lt; n; i++)
+  if (a[i] &gt; max) max = a[i];    /* 发现更大的就更新 */
+printf("%d\n", max);</code></pre></div>
+</div>
+<p>这个「先定一个初值，再逐个比较更新」的模式叫<strong>扫描/维护最值</strong>，后面会反复出现。</p>
+
+<h3>2. 可视化：翻转数组</h3>
+<p>把 <code>1 2 3 4 5</code> 翻转为 <code>5 4 3 2 1</code>：用两个下标 i（头）和 j（尾），<strong>首尾交换</strong>，i 向右、j 向左，直到 $i \ge j$。</p>
+<div class="exec-stage" id="revStage">
+<div class="stage-title"><span class="icon">▶</span>数组翻转过程</div>
+<div class="exec-log" id="revLog" style="margin-top:0">初始化：i=0，j=4。</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+<span data-rev-cell style="width:52px;height:52px;border-radius:12px;border:1px solid var(--line);display:grid;place-items:center;font-weight:800;background:var(--surface)"></span>
+<span data-rev-cell style="width:52px;height:52px;border-radius:12px;border:1px solid var(--line);display:grid;place-items:center;font-weight:800;background:var(--surface)"></span>
+<span data-rev-cell style="width:52px;height:52px;border-radius:12px;border:1px solid var(--line);display:grid;place-items:center;font-weight:800;background:var(--surface)"></span>
+<span data-rev-cell style="width:52px;height:52px;border-radius:12px;border:1px solid var(--line);display:grid;place-items:center;font-weight:800;background:var(--surface)"></span>
+<span data-rev-cell style="width:52px;height:52px;border-radius:12px;border:1px solid var(--line);display:grid;place-items:center;font-weight:800;background:var(--surface)"></span>
+</div>
+<div class="exec-controls">
+<button class="btn primary" id="revNext">执行一次交换</button>
+<strong id="revOut" style="color:var(--sage-deep);font-size:16px"></strong>
+</div>
+</div>
+
+<div class="quiz" data-correct="C" data-quiz="quiz-array">
+<div class="quiz-head"><strong>小测｜求最大值</strong><span class="pill">最值</span></div>
+<div class="quiz-body">
+<p>a = [1, 9, 4, 7, 2]，用「先假设 a[0] 最大，再比较更新」的方法，最终 max 是：</p>
+<div class="options">
+<label class="option"><input name="quiz-array" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer"><span class="mono">1</span></span></span></label>
+<label class="option"><input name="quiz-array" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer"><span class="mono">7</span></span></span></label>
+<label class="option"><input name="quiz-array" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer"><span class="mono">9</span></span></span></label>
+<label class="option"><input name="quiz-array" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer"><span class="mono">2</span></span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="quiz-reverse">
+<div class="quiz-head"><strong>小测｜翻转结果</strong><span class="pill">翻转</span></div>
+<div class="quiz-body">
+<p>把 <code>1 2 3 4 5</code> 首尾交换翻转后是：</p>
+<div class="options">
+<label class="option"><input name="quiz-reverse" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer"><span class="mono">1 2 3 4 5</span></span></span></label>
+<label class="option"><input name="quiz-reverse" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer"><span class="mono">5 4 3 2 1</span></span></span></label>
+<label class="option"><input name="quiz-reverse" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer"><span class="mono">2 1 3 5 4</span></span></span></label>
+<label class="option"><input name="quiz-reverse" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer"><span class="mono">5 4 3 2 1 0</span></span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="string" id="string">
+<div class="section-top">
+<div>
+<p class="section-kicker">3.2 · STRING</p>
+<h2>字符数组与字符串</h2>
+<p class="lead">字符串在 C 里就是「以 \\0 结尾的字符数组」。理解这一点，字符串问题就变成数组问题。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. 字符串 = 字符数组 + \\0</h3>
+<p><code>char s[100] = "abc";</code> 实际存了 4 个字符：<code>a b c \0</code>。最后的 <code>\0</code>（空字符）是字符串的<strong>结束标记</strong>，strlen 数到它就停。声明时要留够空间：<code>char s[100]</code> 最多存 99 个字符。</p>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 3-3 · 判断回文</span><span class="code-lang">C</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+int main() {
+  char s[100];
+  int i, len;
+  scanf("%s", s);          /* 注意：数组名不用加 & */
+  len = strlen(s);
+  for (i = 0; i &lt; len / 2; i++)
+    if (s[i] != s[len - 1 - i]) {
+      printf("NO\n");
+      return 0;
+    }
+  printf("YES\n");
+  return 0;
+}</code></pre></div>
+</div>
+
+<div class="keyline">
+<p><strong>三个常见误区：</strong>① scanf("%s") 读字符串时数组名前面<strong>不写 &</strong>；② 它遇到空格/换行就停，读不了「hello world」整行；③ <code>strcmp</code> 比较字符串是否相等，<strong>不要用 ==</strong>（那是在比地址）。</p>
+</div>
+
+<h3>2. 可视化：字符频率统计</h3>
+<p>输入一句话，统计每个字符出现几次——这是「数组做计数器」的典型应用：</p>
+<div class="exec-stage" id="freqStage">
+<div class="stage-title"><span class="icon">▶</span>字符频率统计</div>
+<div class="answer-row" style="margin-top:0">
+<input type="text" id="freqInput" data-save="freq-input" value="hello" aria-label="输入一串字符"/>
+<button class="btn primary" id="freqRun" type="button">统计</button>
+</div>
+<div id="freqBar" style="display:flex;gap:14px;align-items:flex-end;justify-content:center;min-height:130px;margin-top:10px;flex-wrap:wrap"></div>
+<div class="exec-log" id="freqOut" style="text-align:center"></div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="quiz-string">
+<div class="quiz-head"><strong>小测｜strlen</strong><span class="pill">字符串长度</span></div>
+<div class="quiz-body">
+<p><code>char s[] = "abcde";</code>，<code>strlen(s)</code> 是：</p>
+<div class="options">
+<label class="option"><input name="quiz-string" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer"><span class="mono">6</span></span></span></label>
+<label class="option"><input name="quiz-string" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer"><span class="mono">5</span></span></span></label>
+<label class="option"><input name="quiz-string" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer"><span class="mono">4</span></span></span></label>
+<label class="option"><input name="quiz-string" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer"><span class="mono">0</span></span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="contest" id="contest">
+<div class="section-top">
+<div>
+<p class="section-kicker">3.3 · CONTEST</p>
+<h2>竞赛题目选讲：数一数谁最多</h2>
+<p class="lead">用一道经典题把「数组 + 循环 + 条件」串起来。题目为原创重述。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>例题（原创重述）：出现次数最多的数字</h3>
+<p>给你一个整数 n 和 n 个在 0~9 之间的数字，问哪个数字出现次数最多（并列时输出较小的那个）。</p>
+<p><strong>思路：</strong>开一个大小为 10 的计数器数组 <code>cnt[10]</code>，读到数字 x 就让 <code>cnt[x]++</code>，最后扫一遍 cnt 找最大值。这是「<strong>用数组做计数器</strong>」的经典套路。</p>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 3-4 · 数字频率统计</span><span class="code-lang">C</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main() {
+  int n, i, x;
+  int cnt[10] = {0};        /* 全部初始化为 0 */
+  scanf("%d", &amp;n);
+  for (i = 0; i &lt; n; i++) {
+    scanf("%d", &amp;x);
+    cnt[x]++;
+  }
+  int best = 0;             /* 找出现最多的数字 */
+  for (i = 1; i &lt; 10; i++)
+    if (cnt[i] &gt; cnt[best]) best = i;
+  printf("%d\n", best);
+  return 0;
+}</code></pre></div>
+</div>
+<p>注意 <code>int cnt[10] = {0};</code> 会把整个数组清零——数组初始化的常用写法。并列时输出较小的，所以更新条件用严格大于 <code>&gt;</code> 而不是 <code>&gt;=</code>。</p>
+
+<div class="collapse-wrap">
+<button class="collapse-head" data-collapse="contest-why"><span class="chev">▶</span>为什么计数器数组能「记住」每个数字？<span style="margin-left:auto;color:var(--muted);font-weight:400;font-size:13px">点开看推理</span></button>
+<div class="collapse-body" id="contest-why">
+<p>数字 x 的范围只有 0~9，正好可以当下标：<code>cnt[0]</code> 记 0 出现几次，<code>cnt[1]</code> 记 1 出现几次……读到数字 3 就让 <code>cnt[3]++</code>。数组在这里就是「10 个计数器」。</p>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="oj-note" id="oj-note">
+<div class="section-top">
+<div>
+<p class="section-kicker">3.4 · OJ</p>
+<h2>黑盒测试与在线评测系统</h2>
+<p class="lead">明白 OJ 怎么「打分数」，你才知道比赛里真正要练什么。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. 黑盒测试</h3>
+<p>OJ 不会看你的代码写得好不好看，它只做一件事：<strong>喂输入 → 跑你的程序 → 比对输出</strong>。你的输出和标准答案逐字符相同（包括空格、换行、大小写）才算对。</p>
+<div class="grid-2">
+<div class="card"><div class="mini-title"><span class="icon">⌨</span>常见返回状态</div><p>AC 通过 · WA 答案错 · TLE 超时 · MLE 内存超限 · RE 运行时错误 · CE 编译错误。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">⚙</span>做题流程</div><p>读题 → 想思路 → 写代码 → 本地测试样例 → 提交 → 看状态 → 错了就调试重交。</p></div>
+</div>
+
+<h3>2. 精确输出的三条铁律</h3>
+<div class="checklist">
+<div class="check-item"><span>① 输出最后一行要不要换行：题目说「每行一个」就换行，说「输出 xxx」看样例。</span></div>
+<div class="check-item"><span>② 空格位置：多一个空格、少一个空格都是 WA，先和样例逐字符对。</span></div>
+<div class="check-item"><span>③ 多组数据：题目没说「只有一组」，就用第2章学的 <code>while(scanf(...)==N)</code> 框架。</span></div>
+</div>
+
+<div class="quiz" data-correct="A" data-quiz="quiz-blackbox">
+<div class="quiz-head"><strong>小测｜黑盒测试</strong><span class="pill">OJ 规则</span></div>
+<div class="quiz-body">
+<p>OJ 判断一道题对不对，主要依据是：</p>
+<div class="options">
+<label class="option"><input name="quiz-blackbox" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">对隐藏数据运行后，输出是否与标准答案完全一致</span></span></label>
+<label class="option"><input name="quiz-blackbox" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">代码是否写得简洁优雅</span></span></label>
+<label class="option"><input name="quiz-blackbox" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">是否用了某种指定算法</span></span></label>
+<label class="option"><input name="quiz-blackbox" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">代码里注释是否完整</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="practice" id="practice">
+<div class="section-top">
+<div>
+<p class="section-kicker">3.5 · TRAINING</p>
+<h2>本章训练：限时检验真实掌握</h2>
+<p class="lead">三题闭卷完成，先写答案再核对；错了就把原因写进「错因记录」。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<div class="practice-card">
+<div class="practice-meta"><span class="pill core">训练 1 · 程序输出</span><span class="pill">最值</span></div>
+<h3>写出运行结果</h3>
+<p>运行下面代码，输出什么？</p>
+<div class="code-block" style="margin:10px 0"><div class="code-body"><pre><code class="language-c">int a[5] = {1, 9, 4, 7, 2};
+int max = a[0], i;
+for (i = 1; i &lt; 5; i++)
+  if (a[i] &gt; max) max = a[i];
+printf("%d\n", max);</code></pre></div></div>
+<div class="answer-row">
+<input type="text" data-save="p1-answer" placeholder="输入你的答案"/>
+<button class="btn small primary" onclick="checkNumeric('p1-answer', 9, 'fb-p1', '正确！最大的是 9。', '不对。逐个比较后最大的是 9。')">检查</button>
+</div>
+<div aria-live="polite" class="feedback" id="fb-p1"></div>
+<div class="practice-actions">
+<button class="btn small" data-reveal="p1-solution">查看答案</button>
+<button class="btn small" data-reveal="p1-hint">查看提示</button>
+</div>
+<div class="hint" id="p1-hint">从 a[0]=1 开始，遇到比 max 大的就更新。</div>
+<div class="solution" id="p1-solution">输出 <span class="mono">9</span>。</div>
+</div>
+
+<div class="practice-card">
+<div class="practice-meta"><span class="pill core">训练 2 · 程序输出</span><span class="pill">翻转</span></div>
+<h3>写出运行结果</h3>
+<p>把数组 <code>1 2 3 4 5</code> 首尾交换翻转后，用 printf 依次输出，结果是什么？</p>
+<div class="answer-row">
+<input type="text" data-save="p2-answer" placeholder="例如：5 4 3 2 1"/>
+<button class="btn small primary" onclick="checkExact('p2-answer', '5 4 3 2 1', 'fb-p2', '正确！翻转后是 5 4 3 2 1。', '还不对。首尾对调后依次是 5、4、3、2、1。')">检查</button>
+</div>
+<div aria-live="polite" class="feedback" id="fb-p2"></div>
+<div class="practice-actions">
+<button class="btn small" data-reveal="p2-solution">查看答案</button>
+<button class="btn small" data-reveal="p2-hint">查看提示</button>
+</div>
+<div class="hint" id="p2-hint">a[0] 与 a[4] 换，a[1] 与 a[3] 换，中间的 a[2] 不动。</div>
+<div class="solution" id="p2-solution">输出 <span class="mono">5 4 3 2 1</span>。</div>
+</div>
+
+<div class="practice-card">
+<div class="practice-meta"><span class="pill core">训练 3 · 填空计算</span><span class="pill">strlen</span></div>
+<h3>写出运行结果</h3>
+<p><code>char s[] = "algorithm";</code>，<code>strlen(s)</code> 等于多少？</p>
+<div class="answer-row">
+<input type="text" data-save="p3-answer" placeholder="输入数值"/>
+<button class="btn small primary" onclick="checkNumeric('p3-answer', 9, 'fb-p3', '正确！algorithm 有 9 个字母。', '不对。数一数 a-l-g-o-r-i-t-h-m，是 9 个。')">检查</button>
+</div>
+<div aria-live="polite" class="feedback" id="fb-p3"></div>
+<div class="practice-actions">
+<button class="btn small" data-reveal="p3-solution">查看答案</button>
+<button class="btn small" data-reveal="p3-hint">查看提示</button>
+</div>
+<div class="hint" id="p3-hint">strlen 数到 \\0 为止，\\0 不算长度。</div>
+<div class="solution" id="p3-solution">答案是 <span class="mono">9</span>。</div>
+</div>
+
+<h3>刷题清单：把数组和字符串用到赛场上</h3>
+<p>这 8 道题专门练「数组遍历、最值、计数、字符串」：</p>
+<div class="oj-grid">
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P1046" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P1046</span></div>
+<h4>陶陶摘苹果</h4>
+<p>10 个苹果的高度，判断能摘到几个。</p>
+<p class="oj-why">为什么做：数组读入 + 循环判断，最基础也最该熟练。</p>
+</a>
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P1428" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P1428</span></div>
+<h4>小鱼比可爱</h4>
+<p>对每个位置，统计它左边比它小的个数。</p>
+<p class="oj-why">为什么做：双重循环 + 数组，训练「对每个 i 再看前面的 j」。</p>
+</a>
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P1047" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P1047</span></div>
+<h4>校门外的树</h4>
+<p>区间移树，统计剩下的树。</p>
+<p class="oj-why">为什么做：用数组做「标记」，区间覆盖问题的最简单版本。</p>
+</a>
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P5733" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P5733</span></div>
+<h4>自动修正</h4>
+<p>把小写字母全部转成大写输出。</p>
+<p class="oj-why">为什么做：字符处理 + 循环遍历字符串。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/96/A" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">96A</span></div>
+<h4>Football</h4>
+<p>判断字符串里是否出现连续 7 个相同字符。</p>
+<p class="oj-why">为什么做：遍历字符串 + 连续计数，经典字符串题。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/339/A" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">339A</span></div>
+<h4>Helpful Maths</h4>
+<p>把 1+2+1 这样的算式按数字排序后输出。</p>
+<p class="oj-why">为什么做：字符串拆分 + 排序思路，为第5章 sort 埋伏笔。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/116/A" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">116A</span></div>
+<h4>Tram</h4>
+<p>电车每站上下人，求全程最大载客量。</p>
+<p class="oj-why">为什么做：边读边维护「当前值」和「最大值」。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/158/B" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">158B</span></div>
+<h4>Taxi</h4>
+<p>把 1~4 人分组装进 4 座出租车，求最少车数。</p>
+<p class="oj-why">为什么做：用 cnt[] 计数器统计人数，再贪心凑车。</p>
+</a>
+</div>
+
+<h3>错因记录</h3>
+<p>今天做错的题、踩过的坑，写在这里。</p>
+<textarea data-save="mistake-log" placeholder="例：循环写成 i<=n 越界访问了 a[n]，下次记得是 i<n……"></textarea>
+</section>
+
+<section class="lesson" data-section="finish" id="finish">
+<div class="section-top">
+<div>
+<p class="section-kicker">FINISH · 通关</p>
+<h2>今日通关总结</h2>
+<p class="lead">先闭卷完成下面两项，再看掌握度。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>要点自检</h3>
+<div class="checklist">
+<label class="check-item"><input type="checkbox" data-save-check="c1"/><span>我知道数组下标从 0 开始，写循环时能避免越界。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c2"/><span>我会用循环求最大值、求和、统计出现次数。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c3"/><span>我理解字符串以 <code>\0</code> 结尾，会用 strlen。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c4"/><span>我会写回文判断程序（双指针向中间比较）。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c5"/><span>我会用 <code>cnt[10]</code> 这类计数器数组统计频率。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c6"/><span>我已经在洛谷或 Codeforces 上 AC 了一道数组/字符串题。</span></label>
+</div>
+
+<h3>闭卷写出「方法口诀」</h3>
+<p>数组的编号（下标）从 <strong><input type="text" data-save="finish-method" placeholder="一个数字" style="display:inline-block;width:80px;min-height:38px;padding:6px 10px"/></strong> 开始。</p>
+<button class="btn small primary" onclick="checkExact('finish-method', '0', 'fb-method', '正确！下标从 0 开始，到 n-1 结束。', '答案是数字 0。')">检查</button>
+<div aria-live="polite" class="feedback" id="fb-method"></div>
+
+<h3>用一句话总结本章</h3>
+<textarea data-save="final-summary" placeholder="例：这章我学会了用数组存数据和计数器，最深的坑是越界和 scanf 读空格……"></textarea>
+
+<div class="score-panel" style="margin-top:22px">
+<div class="card" style="display:grid;place-items:center;text-align:center">
+<div class="score-ring" id="scoreRing"><span id="scoreValue">0%</span></div>
+<p style="color:var(--muted);font-size:14px;margin:10px 0 0">本章掌握度 = 测验25% + 进度25% + 自检25% + 训练25%</p>
+</div>
+<div class="card">
+<h3 style="margin-top:0">当前水平</h3>
+<p id="levelText" style="font-size:18px;color:var(--ink-soft)">还没开始？完成上面的题目后这里会显示你的掌握度。</p>
+<div class="practice-actions">
+<button class="btn primary" id="exportBtn2" onclick="exportRecord()">导出学习记录</button>
+<button class="btn danger" onclick="resetAllProgress()">清空本页进度</button>
+</div>
+<p style="color:var(--muted);font-size:14px;margin-top:12px">提示：学习记录会保存成 txt 文件，方便你复盘。</p>
+</div>
+</div>
+</section>
+
+<footer>
+<p>本站内容为原创讲解与原创示例代码，知识体系参考《算法竞赛入门经典（第2版）》刘汝佳 著。</p>
+<p><a href="../../index.html">返回章节总览</a> · 上一章：<a href="../ch02/index.html">第2章 循环结构</a> · 下一章：<a href="../ch04/index.html">第4章 函数和递归</a></p>
+</footer>
+</div>
+</main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<script src="../../assets/js/ch03.js"></script>
+<script src="../../assets/js/lesson.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,671 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="description" content="算法竞赛入门 · 第5章《C++与STL入门》交互式学习：cin/cout、引用、string、vector/set/map、排序与容器可视化。"/>
+<meta content="#F2EFE9" name="theme-color"/>
+<meta content="dark light" name="color-scheme"/>
+<title>第5章 C++ 与 STL 入门 · 算法竞赛入门交互课</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg"/>
+<link rel="stylesheet" href="../../assets/css/lesson.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css"/>
+<script>
+window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] } };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<div class="page-grid">
+<aside aria-label="课程导航" class="sidebar">
+<a class="back-link" href="../../index.html">← 返回章节总览</a>
+<div class="brand">
+<div class="brand-mark">AC</div>
+<div><strong>算法入门 Lab</strong><small>第5章 · C++ 与 STL</small></div>
+</div>
+<div class="timer-card">
+<div class="timer-label">本章总计时</div>
+<div class="timer-display" id="timerDisplay">00:00:00</div>
+<div class="timer-actions">
+<button class="btn primary" id="timerStart">开始</button>
+<button class="btn" id="timerPause">暂停</button>
+<button class="btn ghost" id="timerReset">重置计时</button>
+</div>
+</div>
+<div class="progress-wrap">
+<div class="progress-row"><span>课程进度</span><span id="progressText">0 / 8</span></div>
+<div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+</div>
+<div class="nav-title">学习路线</div>
+<nav class="nav-list" id="sideNav">
+<a class="nav-link" href="#plan"><span class="nav-dot"></span>0. 本章路线</a>
+<a class="nav-link" href="#diagnosis"><span class="nav-dot"></span>1. 预诊断</a>
+<a class="nav-link" href="#cpp"><span class="nav-dot"></span>2. 从 C 到 C++</a>
+<a class="nav-link" href="#stl"><span class="nav-dot"></span>3. STL 初步</a>
+<a class="nav-link" href="#container"><span class="nav-dot"></span>4. 容器可视化</a>
+<a class="nav-link" href="#contest"><span class="nav-dot"></span>5. 竞赛题目举例</a>
+<a class="nav-link" href="#practice"><span class="nav-dot"></span>6. 本章训练</a>
+<a class="nav-link" href="#finish"><span class="nav-dot"></span>7. 通关总结</a>
+</nav>
+<div class="side-tools">
+<button class="btn small" id="themeToggle">切换夜雾</button>
+<button class="btn small" id="exportBtn">导出记录</button>
+</div>
+</aside>
+<main>
+<div class="mobile-bar">
+<button class="btn small primary" id="mobileStart">开始</button>
+<span class="mobile-timer" id="mobileTimer">00:00:00</span>
+<button class="btn small" id="mobilePause">暂停</button>
+<button class="btn small" id="mobileTheme">主题</button>
+</div>
+<div class="content">
+<header class="hero">
+<div class="hero-copy">
+<span class="eyebrow">CHAPTER 5 · 语言篇收官</span>
+<h1>C++ 与 STL 入门</h1>
+<p>从这一章起我们改用 <strong>C++</strong>——ACM 赛场的主流语言。STL 里的 vector、set、map 和 sort 会把你从「重复造轮子」里解放出来，语言篇就此收官。</p>
+<div class="hero-tags">
+<span class="tag">cin / cout</span>
+<span class="tag">引用与 string</span>
+<span class="tag">vector / set / map</span>
+<span class="tag">sort 排序</span>
+<span class="tag">容器可视化</span>
+</div>
+<div class="hero-actions">
+<a class="btn primary" href="#plan">开始本章学习</a>
+<button class="btn" onclick="document.getElementById('cpp').scrollIntoView()">直接进入核心知识</button>
+</div>
+</div>
+<div aria-label="C++ 程序示例" class="hero-visual">
+<div class="code-block" style="box-shadow:none;border:1px solid var(--line)">
+<div class="code-head"><span class="code-title">程序 5-1 · 第一个 C++ 程序</span><span class="code-lang">C++</span></div>
+<div class="code-body"><pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+int main() {
+  int a, b;
+  cin &gt;&gt; a &gt;&gt; b;          /* 读入 */
+  cout &lt;&lt; a + b &lt;&lt; endl;   /* 输出并换行 */
+  return 0;
+}</code></pre></div>
+</div>
+</div>
+</header>
+
+<section class="lesson" data-section="plan" id="plan">
+<div class="section-top">
+<div>
+<p class="section-kicker">PLAN · 路线</p>
+<h2>本章怎么学</h2>
+<p class="lead">学完本章，你能用 C++ 完成输入输出，会用 string 处理文本，会用 vector/set/map 和 sort 解决实际问题——语言篇到此结束，进入基础篇。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>五个学习目标</h3>
+<div class="grid-3">
+<div class="card"><div class="mini-title"><span class="icon">1</span>C++ 框架</div><p>会用 <code>cin / cout</code> 和 <code>#include &lt;iostream&gt;</code>。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">2</span>引用与 string</div><p>理解引用是别名；string 可以直接 +、==、比较。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">3</span>vector</div><p>会用变长数组 vector 的 push_back / size / 下标访问。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">4</span>set 与 map</div><p>会用 set 去重排序、用 map 做键值映射。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">5</span>sort</div><p>会用 <code>sort</code> 排序数组/vector，自定义比较。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">6</span>选型</div><p>遇到问题能判断该用哪个容器。</p></div>
+</div>
+
+<h3>建议时间安排</h3>
+<div class="timeline">
+<div class="time-block"><b>0–10 分钟</b><strong>预诊断</strong><span>5 题摸清起点</span></div>
+<div class="time-block"><b>10–35 分钟</b><strong>从 C 到 C++</strong><span>cin/cout、引用、string</span></div>
+<div class="time-block"><b>35–70 分钟</b><strong>STL 初步</strong><span>vector / set / map / sort</span></div>
+<div class="time-block"><b>70–90 分钟</b><strong>容器可视化</strong><span>动手观察容器行为</span></div>
+<div class="time-block"><b>90–105 分钟</b><strong>竞赛举例</strong><span>用 STL 解题</span></div>
+<div class="time-block"><b>105–130 分钟</b><strong>训练 + 刷题</strong><span>3 道训练 + 错因记录</span></div>
+</div>
+
+<h3>学习主线</h3>
+<div class="method-flow">
+<div class="flow-node"><b>输入输出</b>cin / cout</div>
+<div class="flow-node"><b>字符串</b>string</div>
+<div class="flow-node"><b>容器</b>vector / set / map</div>
+<div class="flow-node"><b>算法</b>sort / 检索</div>
+</div>
+
+<div class="card warning">
+<div class="mini-title"><span class="icon">⚠</span>先记住一句话</div>
+<p>STL 不是「背 API」，而是「<strong>知道每个容器解决什么问题</strong>」：要变长数组用 vector，要去重排序用 set，要按键找值用 map，要排序用 sort。用到时再查具体写法。</p>
+</div>
+</section>
+
+<section class="lesson" data-section="diagnosis" id="diagnosis">
+<div class="section-top">
+<div>
+<p class="section-kicker">DIAGNOSIS · 摸底</p>
+<h2>预诊断：先看你卡在哪里</h2>
+<p class="lead">共 5 题。凭直觉答完再看反馈。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="pre1">
+<div class="quiz-head"><strong>Q1｜cin/cout 在哪？</strong><span class="pill">C++ 基础</span></div>
+<div class="quiz-body">
+<p>使用 <code>cin</code> 和 <code>cout</code> 需要包含哪个头文件？</p>
+<div class="options">
+<label class="option"><input name="pre1" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer"><code>#include &lt;stdio.h&gt;</code></span></span></label>
+<label class="option"><input name="pre1" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer"><code>#include &lt;iostream&gt;</code></span></span></label>
+<label class="option"><input name="pre1" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer"><code>#include &lt;string.h&gt;</code></span></span></label>
+<label class="option"><input name="pre1" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer"><code>#include &lt;algorithm&gt;</code></span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="A" data-quiz="pre2">
+<div class="quiz-head"><strong>Q2｜引用是什么？</strong><span class="pill">引用</span></div>
+<div class="quiz-body">
+<p><code>void f(int &amp;x) { x++; }</code>，调用 <code>f(a)</code> 后，外面的 a：</p>
+<div class="options">
+<label class="option"><input name="pre2" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">会 +1（引用是别名，改的就是 a）</span></span></label>
+<label class="option"><input name="pre2" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">不会变（传的是副本）</span></span></label>
+<label class="option"><input name="pre2" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">变成 0</span></span></label>
+<label class="option"><input name="pre2" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">编译错误</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="A" data-quiz="pre3">
+<div class="quiz-head"><strong>Q3｜string 比较</strong><span class="pill">string</span></div>
+<div class="quiz-body">
+<p>比较两个 C++ string 是否相等，正确写法是：</p>
+<div class="options">
+<label class="option"><input name="pre3" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer"><code>s1 == s2</code></span></span></label>
+<label class="option"><input name="pre3" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer"><code>strcmp(s1, s2) == 0</code></span></span></label>
+<label class="option"><input name="pre3" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer"><code>s1 = s2</code></span></span></label>
+<label class="option"><input name="pre3" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer"><code>s1.equals(s2)</code></span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="pre4">
+<div class="quiz-head"><strong>Q4｜vector 追加</strong><span class="pill">vector</span></div>
+<div class="quiz-body">
+<p><code>vector&lt;int&gt; v;</code> 依次执行 <code>v.push_back(1); v.push_back(2); v.push_back(3);</code> 后，v.size() 是：</p>
+<div class="options">
+<label class="option"><input name="pre4" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer"><span class="mono">1</span></span></span></label>
+<label class="option"><input name="pre4" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer"><span class="mono">3</span></span></span></label>
+<label class="option"><input name="pre4" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer"><span class="mono">2</span></span></span></label>
+<label class="option"><input name="pre4" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer"><span class="mono">0</span></span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="pre5">
+<div class="quiz-head"><strong>Q5｜set 的特性</strong><span class="pill">set</span></div>
+<div class="quiz-body">
+<p>往 <code>set&lt;int&gt; s</code> 里插入 5、3、8、3、1，s 里最终有：</p>
+<div class="options">
+<label class="option"><input name="pre5" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">5 个元素（含重复的 3）</span></span></label>
+<label class="option"><input name="pre5" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">4 个元素：1 3 5 8（去重且有序）</span></span></label>
+<label class="option"><input name="pre5" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">3 个元素</span></span></label>
+<label class="option"><input name="pre5" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">编译错误</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="cpp" id="cpp">
+<div class="section-top">
+<div>
+<p class="section-kicker">5.1 · C++</p>
+<h2>从 C 到 C++：更省事的输入输出</h2>
+<p class="lead">C++ 兼容 C，所以你会的一切依然有效；它新增的语法让代码更短、更不容易出错。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. cin / cout</h3>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 5-2 · 读两个整数输出和</span><span class="code-lang">C++</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+int main() {
+  int a, b;
+  cin &gt;&gt; a &gt;&gt; b;          /* 自动识别类型，不用写 %d */
+  cout &lt;&lt; a + b &lt;&lt; endl;   /* endl 表示换行 */
+  return 0;
+}</code></pre></div>
+</div>
+<p>cin 自动跳过空白、自动按类型读，不用记 <code>%d %f</code>，也不用写 <code>&amp;</code>（string、数组名直接写）。读多组数据直到 EOF 的写法是 <code>while (cin &gt;&gt; a &gt;&gt; b)</code>。</p>
+
+<h3>2. 引用：变量的别名</h3>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 5-3 · 引用交换</span><span class="code-lang">C++</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-cpp">void swap(int &amp;x, int &amp;y) {   /* x、y 是 a、b 的别名 */
+  int t = x; x = y; y = t;
+}
+
+int main() {
+  int a = 3, b = 5;
+  swap(a, b);                /* 不用写 & 了 */
+  cout &lt;&lt; a &lt;&lt; " " &lt;&lt; b &lt;&lt; endl;   /* 5 3 */
+  return 0;
+}</code></pre></div>
+</div>
+
+<h3>3. string：会 + 会 == 的字符串</h3>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 5-4 · string 基础</span><span class="code-lang">C++</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+int main() {
+  string s = "acm", t = "icpc";
+  cout &lt;&lt; s + t &lt;&lt; endl;        /* 拼接：acmicpc */
+  cout &lt;&lt; s.length() &lt;&lt; endl;   /* 长度：3 */
+  cout &lt;&lt; (s == "acm") &lt;&lt; endl; /* 相等比较：1 */
+  return 0;
+}</code></pre></div>
+</div>
+
+<div class="quiz" data-correct="A" data-quiz="quiz-cpp">
+<div class="quiz-head"><strong>小测｜cout 输出</strong><span class="pill">C++ 输出</span></div>
+<div class="quiz-body">
+<p>a=3，b=5，<code>cout &lt;&lt; a &lt;&lt; " " &lt;&lt; b &lt;&lt; endl;</code> 输出：</p>
+<div class="options">
+<label class="option"><input name="quiz-cpp" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer"><span class="mono">3 5</span></span></span></label>
+<label class="option"><input name="quiz-cpp" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer"><span class="mono">35</span></span></span></label>
+<label class="option"><input name="quiz-cpp" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer"><span class="mono">3+5</span></span></span></label>
+<label class="option"><input name="quiz-cpp" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer"><span class="mono">8</span></span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="stl" id="stl">
+<div class="section-top">
+<div>
+<p class="section-kicker">5.2 · STL</p>
+<h2>STL 初步：四大金刚</h2>
+<p class="lead">STL 是 C++ 自带的「工具箱」。先记住每个工具解决什么问题。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. vector：会自己长大的数组</h3>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 5-5 · vector 基本用法</span><span class="code-lang">C++</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+int main() {
+  vector&lt;int&gt; v;
+  v.push_back(5); v.push_back(3);   /* 末尾追加 */
+  v.push_back(8);
+  cout &lt;&lt; v.size() &lt;&lt; endl;         /* 3 */
+  cout &lt;&lt; v[0] &lt;&lt; " " &lt;&lt; v[2] &lt;&lt; endl;  /* 5 8，下标从 0 开始 */
+  return 0;
+}</code></pre></div>
+</div>
+
+<h3>2. set：去重 + 有序</h3>
+<p><code>set&lt;int&gt; s;</code> 自动去重并按从小到大排序；<code>s.insert(x)</code> 插入，<code>s.count(x)</code> 判断在不在。</p>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 5-6 · set 去重排序</span><span class="code-lang">C++</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;set&gt;
+using namespace std;
+
+int main() {
+  set&lt;int&gt; s;
+  s.insert(5); s.insert(3); s.insert(8);
+  s.insert(3);                  /* 重复，被忽略 */
+  for (int x : s) cout &lt;&lt; x &lt;&lt; " ";   /* 3 5 8 */
+  cout &lt;&lt; endl;
+  return 0;
+}</code></pre></div>
+</div>
+
+<h3>3. map：键值映射</h3>
+<p><code>map&lt;string,int&gt; m;</code> 像字典：<code>m["apple"] = 3;</code> 存，<code>m["apple"]</code> 取。常用在「统计词频」「按名字查分数」。</p>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 5-7 · map 统计词频</span><span class="code-lang">C++</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;map&gt;
+using namespace std;
+
+int main() {
+  map&lt;string, int&gt; cnt;
+  cnt["acm"]++;
+  cnt["icpc"]++;
+  cnt["acm"]++;                 /* 现在是 2 */
+  cout &lt;&lt; cnt["acm"] &lt;&lt; endl;   /* 2 */
+  return 0;
+}</code></pre></div>
+</div>
+
+<h3>4. sort：排序就一行</h3><p>sort 底层是快速排序的改进，时间复杂度 $O(n \log n)$，n=10⁶ 也能轻松搞定——这也是很多题目「排序后就好做」的原因。</p>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 5-8 · sort 排序</span><span class="code-lang">C++</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;algorithm&gt;
+using namespace std;
+
+int main() {
+  int a[] = {5, 3, 8, 1, 9};
+  int n = 5;
+  sort(a, a + n);                    /* 从小到大 */
+  for (int i = 0; i &lt; n; i++) cout &lt;&lt; a[i] &lt;&lt; " ";   /* 1 3 5 8 9 */
+  cout &lt;&lt; endl;
+  return 0;
+}</code></pre></div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="quiz-vector">
+<div class="quiz-head"><strong>小测｜vector</strong><span class="pill">vector</span></div>
+<div class="quiz-body">
+<p>初始为空的 vector 依次 push_back 了 1、2、3，v.size() 是：</p>
+<div class="options">
+<label class="option"><input name="quiz-vector" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer"><span class="mono">2</span></span></span></label>
+<label class="option"><input name="quiz-vector" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer"><span class="mono">3</span></span></span></label>
+<label class="option"><input name="quiz-vector" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer"><span class="mono">4</span></span></span></label>
+<label class="option"><input name="quiz-vector" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer"><span class="mono">0</span></span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="container" id="container">
+<div class="section-top">
+<div>
+<p class="section-kicker">5.3 · VISUAL</p>
+<h2>容器可视化：亲眼看它们怎么工作</h2>
+<p class="lead">点一点、插一插，直观感受 vector 和 set 的区别。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. vector vs set：插同一个序列</h3>
+<div class="exec-stage" id="stlStage">
+<div class="stage-title"><span class="icon">▶</span>依次插入 5, 3, 8, 3, 1</div>
+<div class="grid-2">
+<div><p style="color:var(--muted);font-size:13px;margin:0 0 8px">vector（保留顺序与重复）</p><div id="stlVec" style="display:flex;gap:6px;flex-wrap:wrap;min-height:44px;align-items:center"></div></div>
+<div><p style="color:var(--muted);font-size:13px;margin:0 0 8px">set（去重 + 有序）</p><div id="stlSet" style="display:flex;gap:6px;flex-wrap:wrap;min-height:44px;align-items:center"></div></div>
+</div>
+<div class="exec-log" id="stlLog" style="margin-top:12px"></div>
+<div class="exec-controls">
+<button class="btn primary" id="stlNext">插入 5</button>
+</div>
+</div>
+
+<h3>2. sort：输入一堆数看排序</h3>
+<div class="exec-stage" id="sortStage">
+<div class="stage-title"><span class="icon">▶</span>sort 排序演示</div>
+<div class="answer-row" style="margin-top:0">
+<input type="text" id="sortInput" data-save="sort-input" value="5 3 8 1 9 2" aria-label="输入一组数字"/>
+<button class="btn primary" id="sortRun" type="button">排序</button>
+</div>
+<p style="color:var(--muted);font-size:13px;margin:12px 0 6px">升序</p>
+<div id="sortAsc" style="display:flex;gap:6px;flex-wrap:wrap;min-height:40px;align-items:center"></div>
+<p style="color:var(--muted);font-size:13px;margin:12px 0 6px">降序</p>
+<div id="sortDesc" style="display:flex;gap:6px;flex-wrap:wrap;min-height:40px;align-items:center"></div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="quiz-set">
+<div class="quiz-head"><strong>小测｜set 去重</strong><span class="pill">set</span></div>
+<div class="quiz-body">
+<p>往 set 里插入 5、3、8、3、1，遍历输出结果是：</p>
+<div class="options">
+<label class="option"><input name="quiz-set" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer"><span class="mono">5 3 8 3 1</span></span></span></label>
+<label class="option"><input name="quiz-set" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer"><span class="mono">1 3 5 8</span></span></span></label>
+<label class="option"><input name="quiz-set" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer"><span class="mono">5 3 8 1</span></span></span></label>
+<label class="option"><input name="quiz-set" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer"><span class="mono">3 5 8 1</span></span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="contest" id="contest">
+<div class="section-top">
+<div>
+<p class="section-kicker">5.4 · CONTEST</p>
+<h2>竞赛题目举例：去重排序</h2>
+<p class="lead">用一道原创题把 sort、set、vector 串起来，感受 STL 的威力。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>例题（原创重述）：去重后从小到大输出</h3>
+<p>输入 n 个整数，去掉重复的，把剩下的从小到大输出。</p>
+<p><strong>思路一（set）：</strong>全部丢进 set，自动去重 + 有序，遍历输出即可。<strong>思路二（sort + 手动去重）：</strong>先 sort，再跳过连续相同的。</p>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 5-9 · set 一行去重</span><span class="code-lang">C++</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;set&gt;
+using namespace std;
+
+int main() {
+  int n, x;
+  cin &gt;&gt; n;
+  set&lt;int&gt; s;
+  while (n--) { cin &gt;&gt; x; s.insert(x); }
+  for (int v : s) cout &lt;&lt; v &lt;&lt; " ";
+  cout &lt;&lt; endl;
+  return 0;
+}</code></pre></div>
+</div>
+<p>如果还要求「按输入顺序输出第一个出现的」，那就用 vector + set 配合：set 负责查重，vector 负责保序——这是竞赛里的经典组合。</p>
+
+<div class="quiz" data-correct="B" data-quiz="quiz-map">
+<div class="quiz-head"><strong>小测｜map</strong><span class="pill">map</span></div>
+<div class="quiz-body">
+<p>执行 <code>m["a"]=1; m["b"]=2;</code> 后，<code>m["a"]</code> 的值是：</p>
+<div class="options">
+<label class="option"><input name="quiz-map" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer"><span class="mono">2</span></span></span></label>
+<label class="option"><input name="quiz-map" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer"><span class="mono">1</span></span></span></label>
+<label class="option"><input name="quiz-map" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer"><span class="mono">0</span></span></span></label>
+<label class="option"><input name="quiz-map" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">编译错误</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="practice" id="practice">
+<div class="section-top">
+<div>
+<p class="section-kicker">5.5 · TRAINING</p>
+<h2>本章训练：限时检验真实掌握</h2>
+<p class="lead">三题闭卷完成，先写答案再核对；错了就把原因写进「错因记录」。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<div class="practice-card">
+<div class="practice-meta"><span class="pill core">训练 1 · 填空计算</span><span class="pill">sort</span></div>
+<h3>写出运行结果</h3>
+<p><code>int a[] = {2, 7, 1, 8}; sort(a, a+4);</code> 之后 <code>a[0]</code> 等于多少？</p>
+<div class="answer-row">
+<input type="text" data-save="p1-answer" placeholder="输入数值"/>
+<button class="btn small primary" onclick="checkNumeric('p1-answer', 1, 'fb-p1', '正确！升序后最小的 1 排在最前面，a[0]=1。', '不对。sort 升序后数组是 1 2 7 8，a[0] 是 1。')">检查</button>
+</div>
+<div aria-live="polite" class="feedback" id="fb-p1"></div>
+<div class="practice-actions">
+<button class="btn small" data-reveal="p1-solution">查看答案</button>
+<button class="btn small" data-reveal="p1-hint">查看提示</button>
+</div>
+<div class="hint" id="p1-hint">sort 默认从小到大。</div>
+<div class="solution" id="p1-solution">答案是 <span class="mono">1</span>。</div>
+</div>
+
+<div class="practice-card">
+<div class="practice-meta"><span class="pill core">训练 2 · 程序输出</span><span class="pill">set</span></div>
+<h3>写出运行结果</h3>
+<p>往 set 插入 5、3、8、3、1，用 <code>for (int x : s) cout &lt;&lt; x &lt;&lt; " ";</code> 遍历输出，结果是什么？</p>
+<div class="answer-row">
+<input type="text" data-save="p2-answer" placeholder="例如：1 3 5 8"/>
+<button class="btn small primary" onclick="checkExact('p2-answer', '1 3 5 8', 'fb-p2', '正确！set 去重后从小到大：1 3 5 8。', '还不对。set 自动去重并排序，重复的 3 只留一个，结果是 1 3 5 8。')">检查</button>
+</div>
+<div aria-live="polite" class="feedback" id="fb-p2"></div>
+<div class="practice-actions">
+<button class="btn small" data-reveal="p2-solution">查看答案</button>
+<button class="btn small" data-reveal="p2-hint">查看提示</button>
+</div>
+<div class="hint" id="p2-hint">set 去重 + 有序。</div>
+<div class="solution" id="p2-solution">输出 <span class="mono">1 3 5 8</span>。</div>
+</div>
+
+<div class="practice-card">
+<div class="practice-meta"><span class="pill core">训练 3 · 填空计算</span><span class="pill">map</span></div>
+<h3>写出运行结果</h3>
+<p>依次执行 <code>cnt["acm"]++; cnt["icpc"]++; cnt["acm"]++; cnt["acm"]++;</code> 后，<code>cnt["acm"]</code> 等于多少？</p>
+<div class="answer-row">
+<input type="text" data-save="p3-answer" placeholder="输入数值"/>
+<button class="btn small primary" onclick="checkNumeric('p3-answer', 3, 'fb-p3', '正确！"acm" 自增了 3 次。', '不对。"acm" 一共自增 3 次（第1、3、4句）。')">检查</button>
+</div>
+<div aria-live="polite" class="feedback" id="fb-p3"></div>
+<div class="practice-actions">
+<button class="btn small" data-reveal="p3-solution">查看答案</button>
+<button class="btn small" data-reveal="p3-hint">查看提示</button>
+</div>
+<div class="hint" id="p3-hint">数一数 cnt["acm"]++ 出现了几次。</div>
+<div class="solution" id="p3-solution">答案是 <span class="mono">3</span>。</div>
+</div>
+
+<h3>刷题清单：把 C++ 与 STL 用到赛场上</h3>
+<p>这 8 道题专门练「cin/cout、string、容器、sort」：</p>
+<div class="oj-grid">
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P1059" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P1059</span></div>
+<h4>明明的随机数</h4>
+<p>去重后排序输出。</p>
+<p class="oj-why">为什么做：set 或 sort+unique 的经典练习，和本章例题几乎一样。</p>
+</a>
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P1138" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P1138</span></div>
+<h4>第 k 小整数</h4>
+<p>去重后找第 k 小的数。</p>
+<p class="oj-why">为什么做：set 有序的特性直接可用，练「容器选型」。</p>
+</a>
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P1914" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P1914</span></div>
+<h4>小书童—凯撒密码</h4>
+<p>字符串整体偏移 n 位。</p>
+<p class="oj-why">为什么做：string 遍历 + 字符运算，练 char 与 int 的转换。</p>
+</a>
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P3370" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P3370</span></div>
+<h4>【模板】字符串哈希</h4>
+<p>统计不同字符串的个数。</p>
+<p class="oj-why">为什么做：set&lt;string&gt; 一行搞定，是「用 STL 偷懒」的巅峰体验。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/136/A" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">136A</span></div>
+<h4>Presents</h4>
+<p>根据送礼关系还原顺序。</p>
+<p class="oj-why">为什么做：数组 + 逆映射，入门级好题。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/133/A" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">133A</span></div>
+<h4>HQ9+</h4>
+<p>判断字符串是否包含特定字符。</p>
+<p class="oj-why">为什么做：string 遍历 + 条件，巩固 C++ 读字符串。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/236/A" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">236A</span></div>
+<h4>Boy or Girl</h4>
+<p>统计不同字符个数，判断奇偶。</p>
+<p class="oj-why">为什么做：set&lt;char&gt; 自动去重统计，STL 实战第一题。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/58/A" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">58A</span></div>
+<h4>Chat room</h4>
+<p>判断字符串里能否按顺序找到 hello。</p>
+<p class="oj-why">为什么做：双指针扫描字符串，为后面的「子序列」概念打底。</p>
+</a>
+</div>
+
+<h3>错因记录</h3>
+<p>今天做错的题、踩过的坑，写在这里。</p>
+<textarea data-save="mistake-log" placeholder="例：忘了 #include <iostream> 和 using namespace std；set 遍历输出顺序记错了……"></textarea>
+</section>
+
+<section class="lesson" data-section="finish" id="finish">
+<div class="section-top">
+<div>
+<p class="section-kicker">FINISH · 通关</p>
+<h2>今日通关总结</h2>
+<p class="lead">先闭卷完成下面两项，再看掌握度。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>要点自检</h3>
+<div class="checklist">
+<label class="check-item"><input type="checkbox" data-save-check="c1"/><span>我会用 cin/cout 完成输入输出，知道 <code>while (cin &gt;&gt; x)</code> 读多组数据。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c2"/><span>我理解引用是别名，会写 <code>swap(int &amp;x, int &amp;y)</code>。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c3"/><span>我会用 string 的 +、==、length()。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c4"/><span>我会用 vector 的 push_back / size / 下标访问。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c5"/><span>我会用 set 去重排序、map 统计、sort 排序。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c6"/><span>我已经在洛谷或 Codeforces 上 AC 了一道 C++/STL 题。</span></label>
+</div>
+
+<h3>闭卷写出「方法口诀」</h3>
+<p>要一个会自己长大的数组，用 <strong><input type="text" data-save="finish-method" placeholder="英文小写" style="display:inline-block;width:120px;min-height:38px;padding:6px 10px"/></strong>。</p>
+<button class="btn small primary" onclick="checkExact('finish-method', 'vector', 'fb-method', '正确！变长数组用 vector。', '答案是 vector（小写）。')">检查</button>
+<div aria-live="polite" class="feedback" id="fb-method"></div>
+
+<h3>用一句话总结本章</h3>
+<textarea data-save="final-summary" placeholder="例：STL 真香，set 一行去重；语言篇学完，接下来数据结构！……"></textarea>
+
+<div class="score-panel" style="margin-top:22px">
+<div class="card" style="display:grid;place-items:center;text-align:center">
+<div class="score-ring" id="scoreRing"><span id="scoreValue">0%</span></div>
+<p style="color:var(--muted);font-size:14px;margin:10px 0 0">本章掌握度 = 测验25% + 进度25% + 自检25% + 训练25%</p>
+</div>
+<div class="card">
+<h3 style="margin-top:0">当前水平</h3>
+<p id="levelText" style="font-size:18px;color:var(--ink-soft)">还没开始？完成上面的题目后这里会显示你的掌握度。</p>
+<div class="practice-actions">
+<button class="btn primary" id="exportBtn2" onclick="exportRecord()">导出学习记录</button>
+<button class="btn danger" onclick="resetAllProgress()">清空本页进度</button>
+</div>
+<p style="color:var(--muted);font-size:14px;margin-top:12px">提示：学习记录会保存成 txt 文件，方便你复盘。语言篇到此收官，下一站是基础篇第6章《数据结构基础》。</p>
+</div>
+</div>
+</section>
+
+<footer>
+<p>本站内容为原创讲解与原创示例代码，知识体系参考《算法竞赛入门经典（第2版）》刘汝佳 著。</p>
+<p><a href="../../index.html">返回章节总览</a> · 上一章：<a href="../ch04/index.html">第4章 函数和递归</a> · 语言篇收官</p>
+</footer>
+</div>
+</main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<script src="../../assets/js/ch05.js"></script>
+<script src="../../assets/js/lesson.js"></script>
+</body>
+</html>
+

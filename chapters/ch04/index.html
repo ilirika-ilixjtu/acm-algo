@@ -1,0 +1,621 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="description" content="算法竞赛入门 · 第4章《函数和递归》交互式学习：自定义函数、参数传递、调用栈、递归、段错误与栈溢出。"/>
+<meta content="#F2EFE9" name="theme-color"/>
+<meta content="dark light" name="color-scheme"/>
+<title>第4章 函数和递归 · 算法竞赛入门交互课</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg"/>
+<link rel="stylesheet" href="../../assets/css/lesson.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css"/>
+<script>
+window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] } };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<div class="page-grid">
+<aside aria-label="课程导航" class="sidebar">
+<a class="back-link" href="../../index.html">← 返回章节总览</a>
+<div class="brand">
+<div class="brand-mark">AC</div>
+<div><strong>算法入门 Lab</strong><small>第4章 · 函数和递归</small></div>
+</div>
+<div class="timer-card">
+<div class="timer-label">本章总计时</div>
+<div class="timer-display" id="timerDisplay">00:00:00</div>
+<div class="timer-actions">
+<button class="btn primary" id="timerStart">开始</button>
+<button class="btn" id="timerPause">暂停</button>
+<button class="btn ghost" id="timerReset">重置计时</button>
+</div>
+</div>
+<div class="progress-wrap">
+<div class="progress-row"><span>课程进度</span><span id="progressText">0 / 8</span></div>
+<div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+</div>
+<div class="nav-title">学习路线</div>
+<nav class="nav-list" id="sideNav">
+<a class="nav-link" href="#plan"><span class="nav-dot"></span>0. 本章路线</a>
+<a class="nav-link" href="#diagnosis"><span class="nav-dot"></span>1. 预诊断</a>
+<a class="nav-link" href="#function"><span class="nav-dot"></span>2. 自定义函数</a>
+<a class="nav-link" href="#param"><span class="nav-dot"></span>3. 参数传递</a>
+<a class="nav-link" href="#recursion"><span class="nav-dot"></span>4. 递归</a>
+<a class="nav-link" href="#debug"><span class="nav-dot"></span>5. 段错误与调试</a>
+<a class="nav-link" href="#practice"><span class="nav-dot"></span>6. 本章训练</a>
+<a class="nav-link" href="#finish"><span class="nav-dot"></span>7. 通关总结</a>
+</nav>
+<div class="side-tools">
+<button class="btn small" id="themeToggle">切换夜雾</button>
+<button class="btn small" id="exportBtn">导出记录</button>
+</div>
+</aside>
+<main>
+<div class="mobile-bar">
+<button class="btn small primary" id="mobileStart">开始</button>
+<span class="mobile-timer" id="mobileTimer">00:00:00</span>
+<button class="btn small" id="mobilePause">暂停</button>
+<button class="btn small" id="mobileTheme">主题</button>
+</div>
+<div class="content">
+<header class="hero">
+<div class="hero-copy">
+<span class="eyebrow">CHAPTER 4 · 语言篇</span>
+<h1>函数和递归</h1>
+<p>把大问题拆成小函数，是程序员的看家本领；而<strong>递归</strong>——函数调用自己——是竞赛里最难也最美的一种思维。本章把「调用栈」看个透。</p>
+<div class="hero-tags">
+<span class="tag">自定义函数</span>
+<span class="tag">值传递 vs 指针</span>
+<span class="tag">调用栈可视化</span>
+<span class="tag">递归出口</span>
+<span class="tag">栈溢出</span>
+</div>
+<div class="hero-actions">
+<a class="btn primary" href="#plan">开始本章学习</a>
+<button class="btn" onclick="document.getElementById('function').scrollIntoView()">直接进入核心知识</button>
+</div>
+</div>
+<div aria-label="递归阶乘示例" class="hero-visual">
+<div class="code-block" style="box-shadow:none;border:1px solid var(--line)">
+<div class="code-head"><span class="code-title">程序 4-1 · 递归求阶乘</span><span class="code-lang">C</span></div>
+<div class="code-body"><pre><code class="language-c">int fac(int n) {
+  if (n == 0) return 1;   /* 递归出口 */
+  return n * fac(n - 1);  /* 调用自己 */
+}
+/* fac(4) = 4×3×2×1 = 24 */</code></pre></div>
+</div>
+</div>
+</header>
+
+<section class="lesson" data-section="plan" id="plan">
+<div class="section-top">
+<div>
+<p class="section-kicker">PLAN · 路线</p>
+<h2>本章怎么学</h2>
+<p class="lead">学完本章，你能写出带返回值的自定义函数，理解值传递与指针传参的区别，并「看见」递归背后的调用栈。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>五个学习目标</h3>
+<div class="grid-3">
+<div class="card"><div class="mini-title"><span class="icon">1</span>自定义函数</div><p>会写带参数、带返回值的函数，知道 <code>return</code> 的作用。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">2</span>参数传递</div><p>分清形参与实参，理解值传递不改变实参。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">3</span>指针作参数</div><p>会用指针在函数里修改外面的变量（swap 交换）。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">4</span>递归</div><p>能写带递归出口的递归函数（阶乘、斐波那契）。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">5</span>调用栈</div><p>理解递归调用时栈的压入与弹出，能手动追踪几层。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">6</span>调试与崩溃</div><p>认识段错误与栈溢出，会用 printf / gdb 定位问题。</p></div>
+</div>
+
+<h3>建议时间安排</h3>
+<div class="timeline">
+<div class="time-block"><b>0–10 分钟</b><strong>预诊断</strong><span>5 题摸清起点</span></div>
+<div class="time-block"><b>10–35 分钟</b><strong>自定义函数</strong><span>返回类型与 return</span></div>
+<div class="time-block"><b>35–60 分钟</b><strong>参数传递</strong><span>值传递 vs 指针</span></div>
+<div class="time-block"><b>60–90 分钟</b><strong>递归</strong><span>阶乘调用栈可视化</span></div>
+<div class="time-block"><b>90–105 分钟</b><strong>段错误与调试</strong><span>栈溢出与 printf</span></div>
+<div class="time-block"><b>105–130 分钟</b><strong>训练 + 刷题</strong><span>3 道训练 + 错因记录</span></div>
+</div>
+
+<h3>学习主线</h3>
+<div class="method-flow">
+<div class="flow-node"><b>定义</b>返回类型 + 函数名</div>
+<div class="flow-node"><b>调用</b>传参 + 拿返回值</div>
+<div class="flow-node"><b>递归</b>自己调自己 + 出口</div>
+<div class="flow-node"><b>调试</b>看调用栈找 bug</div>
+</div>
+
+<div class="card warning">
+<div class="mini-title"><span class="icon">⚠</span>先记住一句话</div>
+<p>递归三件事：<strong>① 明确函数做什么；② 找到递归出口；③ 相信递归能解决子问题</strong>。写递归时不要一步步展开到 10 层，那会把自己绕晕。</p>
+</div>
+</section>
+
+<section class="lesson" data-section="diagnosis" id="diagnosis">
+<div class="section-top">
+<div>
+<p class="section-kicker">DIAGNOSIS · 摸底</p>
+<h2>预诊断：先看你卡在哪里</h2>
+<p class="lead">共 5 题。凭直觉答完再看反馈。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="pre1">
+<div class="quiz-head"><strong>Q1｜int 是什么？</strong><span class="pill">函数声明</span></div>
+<div class="quiz-body">
+<p><code>int add(int a, int b) { return a + b; }</code> 开头的 <code>int</code> 表示：</p>
+<div class="options">
+<label class="option"><input name="pre1" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">参数个数</span></span></label>
+<label class="option"><input name="pre1" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">函数的返回类型是 int</span></span></label>
+<label class="option"><input name="pre1" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">函数只能被调用一次</span></span></label>
+<label class="option"><input name="pre1" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">函数名必须是 int</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="pre2">
+<div class="quiz-head"><strong>Q2｜值传递</strong><span class="pill">参数传递</span></div>
+<div class="quiz-body">
+<p>在函数里改形参，会影响调用处的实参吗？</p>
+<div class="options">
+<label class="option"><input name="pre2" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">会，函数能改任何变量</span></span></label>
+<label class="option"><input name="pre2" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">不会，传的是副本</span></span></label>
+<label class="option"><input name="pre2" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">看运气</span></span></label>
+<label class="option"><input name="pre2" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">只有 main 函数能被改</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="A" data-quiz="pre3">
+<div class="quiz-head"><strong>Q3｜递归的关键</strong><span class="pill">递归</span></div>
+<div class="quiz-body">
+<p>写递归函数最关键的是：</p>
+<div class="options">
+<label class="option"><input name="pre3" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">必须有递归出口（不再调用自己的条件）</span></span></label>
+<label class="option"><input name="pre3" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">参数越多越好</span></span></label>
+<label class="option"><input name="pre3" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">必须用全局变量</span></span></label>
+<label class="option"><input name="pre3" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">不能有返回值</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="C" data-quiz="pre4">
+<div class="quiz-head"><strong>Q4｜fac(4) 等于？</strong><span class="pill">阶乘</span></div>
+<div class="quiz-body">
+<p><code>fac(n)</code> 是阶乘函数，<code>fac(4)</code> 等于：</p>
+<div class="options">
+<label class="option"><input name="pre4" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer"><span class="mono">10</span></span></span></label>
+<label class="option"><input name="pre4" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer"><span class="mono">16</span></span></span></label>
+<label class="option"><input name="pre4" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer"><span class="mono">24</span></span></span></label>
+<label class="option"><input name="pre4" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer"><span class="mono">4</span></span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="A" data-quiz="pre5">
+<div class="quiz-head"><strong>Q5｜栈溢出</strong><span class="pill">崩溃</span></div>
+<div class="quiz-body">
+<p>递归层数太多导致程序崩溃，最常见的原因是：</p>
+<div class="options">
+<label class="option"><input name="pre5" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">调用栈内存被占满（栈溢出）</span></span></label>
+<label class="option"><input name="pre5" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">电脑没电了</span></span></label>
+<label class="option"><input name="pre5" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">return 写得太多</span></span></label>
+<label class="option"><input name="pre5" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">编译器偷懒</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="function" id="function">
+<div class="section-top">
+<div>
+<p class="section-kicker">4.1 · FUNCTION</p>
+<h2>自定义函数：把功能打包</h2>
+<p class="lead">函数让你「写一次，用很多次」，还能让主程序像读故事一样清楚。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. 函数的样子</h3>
+<p>一个函数由三部分组成：<strong>返回类型、函数名、参数列表</strong>。函数体里的 <code>return 值;</code> 把结果交回给调用者。</p>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 4-2 · 判断素数</span><span class="code-lang">C</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int is_prime(int x) {         /* 返回 1 表示是素数，0 表示不是 */
+  int i;
+  if (x &lt; 2) return 0;
+  for (i = 2; i * i &lt;= x; i++)
+    if (x % i == 0) return 0;  /* 找到因子，直接返回 */
+  return 1;
+}
+
+int main() {
+  int n;
+  scanf("%d", &amp;n);
+  if (is_prime(n)) printf("YES\n");
+  else printf("NO\n");
+  return 0;
+}</code></pre></div>
+</div>
+<p>注意 <code>i * i &lt;= x</code>：检查到 $\sqrt{x}$ 就够了，这是判断素数的标准优化。函数一旦 <code>return</code> 就立刻结束，后面的代码不再执行。</p>
+
+<h3>2. 函数的好处</h3>
+<div class="grid-2">
+<div class="card"><div class="mini-title"><span class="icon">✓</span>复用</div><p>同一个功能（判断素数、求阶乘）写一次，到处调用。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">✓</span>清晰</div><p>main 函数只描述「做什么」，细节藏进函数里。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">✓</span>好测</div><p>单独测一个函数比测整个程序容易得多。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">✓</span>递归基础</div><p>函数能调用自己，这是下一节递归的前提。</p></div>
+</div>
+
+<div class="quiz" data-correct="A" data-quiz="quiz-prime">
+<div class="quiz-head"><strong>小测｜判断素数</strong><span class="pill">循环 + 函数</span></div>
+<div class="quiz-body">
+<p>is_prime(15) 会返回什么？</p>
+<div class="options">
+<label class="option"><input name="quiz-prime" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer"><span class="mono">0</span>（15=3×5，不是素数）</span></span></label>
+<label class="option"><input name="quiz-prime" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer"><span class="mono">1</span>（是素数）</span></span></label>
+<label class="option"><input name="quiz-prime" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">编译错误</span></span></label>
+<label class="option"><input name="quiz-prime" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer"><span class="mono">15</span></span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="param" id="param">
+<div class="section-top">
+<div>
+<p class="section-kicker">4.2 · PARAM</p>
+<h2>函数调用与参数传递</h2>
+<p class="lead">C 默认按值传参；想改外面的变量，就得传指针。这是新手最容易绕晕的一关。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. 值传递：传的是副本</h3>
+<p><code>f(a)</code> 调用时，系统把 <code>a</code> 的<strong>值复制</strong>一份给形参。函数里改形参，改的是副本，外面的 <code>a</code> 毫发无损。</p>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 4-3 · 想交换 a、b？按值传不行</span><span class="code-lang">C</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-c">void swap_bad(int x, int y) {   /* x、y 是副本 */
+  int t = x; x = y; y = t;      /* 只换了副本 */
+}
+
+void swap(int *pa, int *pb) {   /* 传地址 */
+  int t = *pa; *pa = *pb; *pb = t;  /* 改真正的值 */
+}
+
+int main() {
+  int a = 3, b = 5;
+  swap_bad(a, b);   printf("%d %d\n", a, b);  /* 3 5，没换 */
+  swap(&amp;a, &amp;b);    printf("%d %d\n", a, b);  /* 5 3，换了 */
+  return 0;
+}</code></pre></div>
+</div>
+<p><code>*pa</code> 表示「pa 指向的那个变量」。传 <code>&amp;a</code> 就是告诉函数 a 住在哪里，函数就能直接改它。</p>
+
+<h3>2. 可视化：按值 vs 按指针</h3>
+<div class="exec-stage" id="swapStage">
+<div class="stage-title"><span class="icon">▶</span>swap(a, b) 两种传法对比（a=3，b=5）</div>
+<div class="practice-actions" style="margin-top:0">
+<button class="btn small" id="swapValue">按值传递 swap_bad</button>
+<button class="btn small primary" id="swapPointer">按指针传递 swap</button>
+</div>
+<div id="swapBox" style="display:flex;gap:14px;margin-top:12px;flex-wrap:wrap"></div>
+<div class="exec-log" id="swapLog" style="margin-top:10px"></div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="quiz-swap">
+<div class="quiz-head"><strong>小测｜指针交换</strong><span class="pill">指针</span></div>
+<div class="quiz-body">
+<p>执行 <code>swap(&amp;a, &amp;b);</code>（a=3, b=5）后，a 和 b 分别是：</p>
+<div class="options">
+<label class="option"><input name="quiz-swap" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">a=3, b=5（没变）</span></span></label>
+<label class="option"><input name="quiz-swap" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">a=5, b=3（交换成功）</span></span></label>
+<label class="option"><input name="quiz-swap" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">a=3, b=3</span></span></label>
+<label class="option"><input name="quiz-swap" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">a=5, b=5</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="keyline">
+<p><strong>一句话记牢：</strong>想改数组里的元素、改外面的变量——传地址（指针）；只是「用一下值」——直接传值。</p>
+</div>
+</section>
+
+<section class="lesson" data-section="recursion" id="recursion">
+<div class="section-top">
+<div>
+<p class="section-kicker">4.3 · RECURSION</p>
+<h2>递归：函数调用自己</h2>
+<p class="lead">递归不是「循环的替代品」，而是一种全新的思维方式：把大问题拆成更小的同类问题。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. 递归的两块拼图</h3>
+<div class="grid-2">
+<div class="card"><div class="mini-title"><span class="icon">①</span>递归出口（基线条件）</div><p>最简单的情况直接给答案，不再调用自己。没有出口 = 无限递归 = 栈溢出。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">②</span>递归步骤</div><p>把问题缩小，用「更小的自己」算出结果，再组合成大问题的答案。</p></div>
+</div>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 4-4 · 递归求阶乘</span><span class="code-lang">C</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-c">int fac(int n) {
+  if (n == 0) return 1;        /* 出口：0! = 1 */
+  return n * fac(n - 1);       /* 步骤：n! = n × (n-1)! */
+}</code></pre></div>
+</div>
+
+<h3>2. 可视化：fac(4) 的调用栈</h3>
+<p>每调用一次函数，系统就往栈上「压入」一个帧，记录局部变量和返回地址；函数返回时「弹出」。下面一步步看：</p>
+<div class="exec-stage" id="recStage">
+<div class="stage-title"><span class="icon">▶</span>fac(4) 调用栈</div>
+<div class="grid-2">
+<div>
+<p style="color:var(--muted);font-size:13px;margin:0 0 8px">调用栈（越靠上越新）</p>
+<div id="recStack" style="display:flex;flex-direction:column;gap:6px;min-height:120px"></div>
+</div>
+<div class="exec-log" id="recLog" style="margin-top:0">开始：main 调用 fac(4)。</div>
+</div>
+<div class="exec-controls">
+<button class="btn primary" id="recNext">下一步</button>
+<strong id="recRet" style="color:var(--sage-deep);font-size:16px"></strong>
+</div>
+</div>
+
+<h3>3. 追踪递归的三个技巧</h3>
+<div class="checklist">
+<div class="check-item"><span>① 先找出口：n=0 返回 1，这是递归的「地基」。</span></div>
+<div class="check-item"><span>② 相信子问题：别一层层展开，假设 fac(n-1) 已经算对了。</span></div>
+<div class="check-item"><span>③ 注意深度：递归太深（如 10 万层）会栈溢出，后面学「递推」来避免。</span></div>
+</div>
+
+<div class="quiz" data-correct="C" data-quiz="quiz-fib">
+<div class="quiz-head"><strong>小测｜斐波那契</strong><span class="pill">递归</span></div>
+<div class="quiz-body">
+<p><code>fib(0)=0, fib(1)=1, fib(n)=fib(n-1)+fib(n-2)</code>，那么 <code>fib(5)</code> 等于：</p>
+<div class="options">
+<label class="option"><input name="quiz-fib" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer"><span class="mono">3</span></span></span></label>
+<label class="option"><input name="quiz-fib" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer"><span class="mono">4</span></span></span></label>
+<label class="option"><input name="quiz-fib" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer"><span class="mono">5</span></span></span></label>
+<label class="option"><input name="quiz-fib" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer"><span class="mono">6</span></span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="debug" id="debug">
+<div class="section-top">
+<div>
+<p class="section-kicker">4.4 · DEBUG</p>
+<h2>段错误、栈溢出与调试</h2>
+<p class="lead">RE（运行时错误）大多是段错误；学会定位，比赛里能省下大量时间。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. 两种常见崩溃</h3>
+<div class="grid-2">
+<div class="card danger"><div class="mini-title"><span class="icon">!</span>段错误（Segmentation Fault）</div><p>访问了不该访问的内存：数组越界、空指针、scanf 忘写 &。通常一行定位：看 RE 前最后一次输出在哪个 printf 附近。</p></div>
+<div class="card warning"><div class="mini-title"><span class="icon">!</span>栈溢出（Stack Overflow）</div><p>递归太深或局部数组太大，把栈内存用光。对策：改递推、减小局部数组、加大数组到全局。</p></div>
+</div>
+
+<h3>2. 调试三板斧</h3>
+<div class="checklist">
+<div class="check-item"><span>① printf 大法：在关键位置打印变量，看程序走到哪、值是什么。</span></div>
+<div class="check-item"><span>② 小数据手算：拿一个 3、4 这样的小样例，把每一步在纸上走一遍。</span></div>
+<div class="check-item"><span>③ 对拍：写一个暴力「笨办法」，和你的算法在小数据上比结果。</span></div>
+</div>
+
+<div class="quiz" data-correct="A" data-quiz="quiz-debug">
+<div class="quiz-head"><strong>小测｜递归深度</strong><span class="pill">栈溢出</span></div>
+<div class="quiz-body">
+<p>递归求 1+2+…+n，n=100000 时最可能发生：</p>
+<div class="options">
+<label class="option"><input name="quiz-debug" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">栈溢出崩溃</span></span></label>
+<label class="option"><input name="quiz-debug" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">编译错误</span></span></label>
+<label class="option"><input name="quiz-debug" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">结果错误但不崩溃</span></span></label>
+<label class="option"><input name="quiz-debug" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">正常运行，没问题</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="practice" id="practice">
+<div class="section-top">
+<div>
+<p class="section-kicker">4.5 · TRAINING</p>
+<h2>本章训练：限时检验真实掌握</h2>
+<p class="lead">三题闭卷完成，先写答案再核对；错了就把原因写进「错因记录」。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<div class="practice-card">
+<div class="practice-meta"><span class="pill core">训练 1 · 填空计算</span><span class="pill">阶乘</span></div>
+<h3>写出运行结果</h3>
+<p>用递归函数 <code>fac(n)</code> 计算，<code>fac(5)</code> 等于多少？</p>
+<div class="answer-row">
+<input type="text" data-save="p1-answer" placeholder="输入数值"/>
+<button class="btn small primary" onclick="checkNumeric('p1-answer', 120, 'fb-p1', '正确！5! = 5×4×3×2×1 = 120。', '不对。5! = 5×4×3×2×1 = 120。')">检查</button>
+</div>
+<div aria-live="polite" class="feedback" id="fb-p1"></div>
+<div class="practice-actions">
+<button class="btn small" data-reveal="p1-solution">查看答案</button>
+<button class="btn small" data-reveal="p1-hint">查看提示</button>
+</div>
+<div class="hint" id="p1-hint">5! = 5 × 4!，一路算到 0! = 1。</div>
+<div class="solution" id="p1-solution">答案是 <span class="mono">120</span>。</div>
+</div>
+
+<div class="practice-card">
+<div class="practice-meta"><span class="pill core">训练 2 · 程序输出</span><span class="pill">指针交换</span></div>
+<h3>写出运行结果</h3>
+<p>a=3，b=5，执行 <code>swap(&amp;a, &amp;b);</code> 后输出 <code>printf("%d %d", a, b);</code>，结果是什么？</p>
+<div class="answer-row">
+<input type="text" data-save="p2-answer" placeholder="例如：5 3"/>
+<button class="btn small primary" onclick="checkExact('p2-answer', '5 3', 'fb-p2', '正确！指针传参交换成功：a=5，b=3。', '还不对。按指针传参能改到真正的 a、b，交换后是 5 3。')">检查</button>
+</div>
+<div aria-live="polite" class="feedback" id="fb-p2"></div>
+<div class="practice-actions">
+<button class="btn small" data-reveal="p2-solution">查看答案</button>
+<button class="btn small" data-reveal="p2-hint">查看提示</button>
+</div>
+<div class="hint" id="p2-hint">swap(&amp;a,&amp;b) 传的是地址，函数里 *pa、*pb 改的是真正的 a、b。</div>
+<div class="solution" id="p2-solution">输出 <span class="mono">5 3</span>。</div>
+</div>
+
+<div class="practice-card">
+<div class="practice-meta"><span class="pill core">训练 3 · 填空计算</span><span class="pill">斐波那契</span></div>
+<h3>写出运行结果</h3>
+<p>fib(0)=0，fib(1)=1，fib(n)=fib(n-1)+fib(n-2)，<code>fib(6)</code> 等于多少？</p>
+<div class="answer-row">
+<input type="text" data-save="p3-answer" placeholder="输入数值"/>
+<button class="btn small primary" onclick="checkNumeric('p3-answer', 8, 'fb-p3', '正确！序列是 0 1 1 2 3 5 8，fib(6)=8。', '不对。数列是 0 1 1 2 3 5 8，fib(6) 是第 7 个数：8。')">检查</button>
+</div>
+<div aria-live="polite" class="feedback" id="fb-p3"></div>
+<div class="practice-actions">
+<button class="btn small" data-reveal="p3-solution">查看答案</button>
+<button class="btn small" data-reveal="p3-hint">查看提示</button>
+</div>
+<div class="hint" id="p3-hint">把数列写出来：0, 1, 1, 2, 3, 5, 8, …</div>
+<div class="solution" id="p3-solution">答案是 <span class="mono">8</span>。</div>
+</div>
+
+<h3>刷题清单：把函数和递归用到赛场上</h3>
+<p>这 8 道题专门练「函数、参数传递、递归」：</p>
+<div class="oj-grid">
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P5739" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P5739</span></div>
+<h4>计算阶乘</h4>
+<p>输入 n，输出 n!。</p>
+<p class="oj-why">为什么做：函数或循环都能写，先各写一遍对比。</p>
+</a>
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P1028" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P1028</span></div>
+<h4>数的计算</h4>
+<p>按规则统计可以生成的数。</p>
+<p class="oj-why">为什么做：递推/递归的经典入门，体会「从递归到递推」。</p>
+</a>
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P1720" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P1720</span></div>
+<h4>月落乌啼算钱</h4>
+<p>斐波那契数列的实战版。</p>
+<p class="oj-why">为什么做：递归 + 递推都试试，体会递归太深会爆栈。</p>
+</a>
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P5461" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P5461</span></div>
+<h4>赦免战俘</h4>
+<p>递归填矩阵的经典题。</p>
+<p class="oj-why">为什么做：递归 + 二维数组，为第6章「递归遍历」打基础。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/233/A" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">233A</span></div>
+<h4>Perfect Permutation</h4>
+<p>构造满足 p[p[i]]=i 的排列。</p>
+<p class="oj-why">为什么做：数组 + 构造，锻炼「自己构造答案」的能力。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/282/A" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">282A</span></div>
+<h4>Bit++</h4>
+<p>模拟 ++ 和 -- 操作。</p>
+<p class="oj-why">为什么做：字符串 + 条件统计，简单但训练读题。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/110/A" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">110A</span></div>
+<h4>Nearly Lucky Number</h4>
+<p>统计数字里 4 和 7 的个数。</p>
+<p class="oj-why">为什么做：数字拆位 + 计数，函数化的好练习。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/271/A" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">271A</span></div>
+<h4>Beautiful Year</h4>
+<p>找下一个四位数字各不相同的年份。</p>
+<p class="oj-why">为什么做：拆位判断 + 递增枚举，练「把判断写成函数」。</p>
+</a>
+</div>
+
+<h3>错因记录</h3>
+<p>今天做错的题、踩过的坑，写在这里。</p>
+<textarea data-save="mistake-log" placeholder="例：递归忘了写出口，直接栈溢出；swap 忘了传 &……"></textarea>
+</section>
+
+<section class="lesson" data-section="finish" id="finish">
+<div class="section-top">
+<div>
+<p class="section-kicker">FINISH · 通关</p>
+<h2>今日通关总结</h2>
+<p class="lead">先闭卷完成下面两项，再看掌握度。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>要点自检</h3>
+<div class="checklist">
+<label class="check-item"><input type="checkbox" data-save-check="c1"/><span>我会写带参数、带返回值的自定义函数。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c2"/><span>我理解值传递不改变实参，指针传参才能改外面的变量。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c3"/><span>我会用 <code>swap(&amp;a,&amp;b)</code> 交换两个变量。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c4"/><span>我会写带递归出口的递归函数（阶乘、斐波那契）。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c5"/><span>我能手动追踪 fac(4) 的调用栈压入与弹出。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c6"/><span>我已经在洛谷或 Codeforces 上 AC 了一道函数/递归题。</span></label>
+</div>
+
+<h3>闭卷写出「方法口诀」</h3>
+<p>递归两大块：<strong>递归<input type="text" data-save="finish-method" placeholder="两个字" style="display:inline-block;width:110px;min-height:38px;padding:6px 10px"/> + 递归步骤</strong>。</p>
+<button class="btn small primary" onclick="checkExact('finish-method', '出口', 'fb-method', '正确！递归出口 + 递归步骤。', '答案是两个字：出口。')">检查</button>
+<div aria-live="polite" class="feedback" id="fb-method"></div>
+
+<h3>用一句话总结本章</h3>
+<textarea data-save="final-summary" placeholder="例：这章我终于看懂了调用栈，递归不再可怕……"></textarea>
+
+<div class="score-panel" style="margin-top:22px">
+<div class="card" style="display:grid;place-items:center;text-align:center">
+<div class="score-ring" id="scoreRing"><span id="scoreValue">0%</span></div>
+<p style="color:var(--muted);font-size:14px;margin:10px 0 0">本章掌握度 = 测验25% + 进度25% + 自检25% + 训练25%</p>
+</div>
+<div class="card">
+<h3 style="margin-top:0">当前水平</h3>
+<p id="levelText" style="font-size:18px;color:var(--ink-soft)">还没开始？完成上面的题目后这里会显示你的掌握度。</p>
+<div class="practice-actions">
+<button class="btn primary" id="exportBtn2" onclick="exportRecord()">导出学习记录</button>
+<button class="btn danger" onclick="resetAllProgress()">清空本页进度</button>
+</div>
+<p style="color:var(--muted);font-size:14px;margin-top:12px">提示：学习记录会保存成 txt 文件，方便你复盘。</p>
+</div>
+</div>
+</section>
+
+<footer>
+<p>本站内容为原创讲解与原创示例代码，知识体系参考《算法竞赛入门经典（第2版）》刘汝佳 著。</p>
+<p><a href="../../index.html">返回章节总览</a> · 上一章：<a href="../ch03/index.html">第3章 数组和字符串</a> · 下一章：<a href="../ch05/index.html">第5章 C++ 与 STL</a></p>
+</footer>
+</div>
+</main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<script src="../../assets/js/ch04.js"></script>
+<script src="../../assets/js/lesson.js"></script>
+</body>
+</html>

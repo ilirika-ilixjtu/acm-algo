@@ -5,10 +5,16 @@
 ## 站点结构
 
 - `index.html` — 首页：学习路线、章节地图、刷题平台指引
-- `chapters/ch01/index.html` — 第1章《程序设计入门》交互课（样板课）
+- `chapters/ch01/index.html` — 第1章《程序设计入门》
+- `chapters/ch02/index.html` — 第2章《循环结构程序设计》
+- `chapters/ch03/index.html` — 第3章《数组和字符串》
+- `chapters/ch04/index.html` — 第4章《函数和递归》
+- `chapters/ch05/index.html` — 第5章《C++ 与 STL 入门》
 - `assets/css/lesson.css` — 共享课堂样式（莫兰迪纸感 + 明暗双主题）
 - `assets/js/lesson.js` — 共享交互逻辑（计时、进度、测验、导出、重置）
-- `assets/js/ch01.js` — 第1章配置与交互演示
+- `assets/js/ch0X.js` — 各章配置与交互演示
+
+语言篇（第1–5章）已全部上线；基础篇、竞赛篇逐章制作中。
 
 ## 新增章节流程
 

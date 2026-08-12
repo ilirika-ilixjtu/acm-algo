@@ -1,0 +1,643 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="description" content="算法竞赛入门 · 第2章《循环结构程序设计》交互式学习：for/while/do-while、循环的代价、多组数据输入框架。"/>
+<meta content="#F2EFE9" name="theme-color"/>
+<meta content="dark light" name="color-scheme"/>
+<title>第2章 循环结构程序设计 · 算法竞赛入门交互课</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg"/>
+<link rel="stylesheet" href="../../assets/css/lesson.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css"/>
+<script>
+window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] } };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<div class="page-grid">
+<aside aria-label="课程导航" class="sidebar">
+<a class="back-link" href="../../index.html">← 返回章节总览</a>
+<div class="brand">
+<div class="brand-mark">AC</div>
+<div><strong>算法入门 Lab</strong><small>第2章 · 循环结构</small></div>
+</div>
+<div class="timer-card">
+<div class="timer-label">本章总计时</div>
+<div class="timer-display" id="timerDisplay">00:00:00</div>
+<div class="timer-actions">
+<button class="btn primary" id="timerStart">开始</button>
+<button class="btn" id="timerPause">暂停</button>
+<button class="btn ghost" id="timerReset">重置计时</button>
+</div>
+</div>
+<div class="progress-wrap">
+<div class="progress-row"><span>课程进度</span><span id="progressText">0 / 8</span></div>
+<div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+</div>
+<div class="nav-title">学习路线</div>
+<nav class="nav-list" id="sideNav">
+<a class="nav-link" href="#plan"><span class="nav-dot"></span>0. 本章路线</a>
+<a class="nav-link" href="#diagnosis"><span class="nav-dot"></span>1. 预诊断</a>
+<a class="nav-link" href="#loop-for"><span class="nav-dot"></span>2. for 循环</a>
+<a class="nav-link" href="#loop-while"><span class="nav-dot"></span>3. while 循环</a>
+<a class="nav-link" href="#loop-cost"><span class="nav-dot"></span>4. 循环的代价</a>
+<a class="nav-link" href="#io-frame"><span class="nav-dot"></span>5. 输入输出框架</a>
+<a class="nav-link" href="#practice"><span class="nav-dot"></span>6. 本章训练</a>
+<a class="nav-link" href="#finish"><span class="nav-dot"></span>7. 通关总结</a>
+</nav>
+<div class="side-tools">
+<button class="btn small" id="themeToggle">切换夜雾</button>
+<button class="btn small" id="exportBtn">导出记录</button>
+</div>
+</aside>
+<main>
+<div class="mobile-bar">
+<button class="btn small primary" id="mobileStart">开始</button>
+<span class="mobile-timer" id="mobileTimer">00:00:00</span>
+<button class="btn small" id="mobilePause">暂停</button>
+<button class="btn small" id="mobileTheme">主题</button>
+</div>
+<div class="content">
+<header class="hero">
+<div class="hero-copy">
+<span class="eyebrow">CHAPTER 2 · 语言篇</span>
+<h1>循环结构<br/>程序设计</h1>
+<p>程序最强大的能力是<strong>重复</strong>：让一段代码执行 100 万次，对计算机来说只是一瞬间。本章掌握 for / while / do-while，学会累加、枚举和「读到文件尾」的多组数据输入。</p>
+<div class="hero-tags">
+<span class="tag">for / while / do-while</span>
+<span class="tag">循环可视化</span>
+<span class="tag">多组数据输入</span>
+<span class="tag">复杂度初体验</span>
+<span class="tag">进度自动保存</span>
+</div>
+<div class="hero-actions">
+<a class="btn primary" href="#plan">开始本章学习</a>
+<button class="btn" onclick="document.getElementById('loop-for').scrollIntoView()">直接进入核心知识</button>
+</div>
+</div>
+<div aria-label="for 循环累加示例" class="hero-visual">
+<div class="code-block" style="box-shadow:none;border:1px solid var(--line)">
+<div class="code-head"><span class="code-title">程序 2-1 · 计算 1+2+…+n</span><span class="code-lang">C</span></div>
+<div class="code-body"><pre><code class="language-c">int n, i, s = 0;
+scanf("%d", &amp;n);
+for (i = 1; i &lt;= n; i++)
+  s += i;          /* 等价于 s = s + i */
+printf("%d\n", s); /* n=5 时输出 15 */</code></pre></div>
+</div>
+</div>
+</header>
+
+<section class="lesson" data-section="plan" id="plan">
+<div class="section-top">
+<div>
+<p class="section-kicker">PLAN · 路线</p>
+<h2>本章怎么学</h2>
+<p class="lead">学完本章，你能用循环解决「重复计算 n 次」「逐项累加」「读多组数据」三大类问题，并大致估算一个程序要跑多久。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>六个学习目标</h3>
+<div class="grid-3">
+<div class="card"><div class="mini-title"><span class="icon">1</span>for 循环</div><p>掌握「初始化 → 判断 → 更新」三要素，能数清循环执行了几次。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">2</span>while / do-while</div><p>理解「先判断后执行」与「先执行后判断」的区别，知道什么时候该用哪种。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">3</span>累加与枚举</div><p>会用 <code>s += i</code> 累加、用循环枚举所有可能的情况。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">4</span>循环的代价</div><p>会估算循环次数，知道 $O(n)$ 与 $O(n^2)$ 的量级差别。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">5</span>输入输出框架</div><p>会用 <code>while(scanf(...) == 1)</code> 处理「多组数据」和「读到文件尾」。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">6</span>调试基本功</div><p>会在循环里加 printf 观察变量变化，快速定位死循环。</p></div>
+</div>
+
+<h3>建议时间安排</h3>
+<div class="timeline">
+<div class="time-block"><b>0–10 分钟</b><strong>预诊断</strong><span>5 题摸清起点</span></div>
+<div class="time-block"><b>10–35 分钟</b><strong>for 循环</strong><span>三要素与累加可视化</span></div>
+<div class="time-block"><b>35–60 分钟</b><strong>while 循环</strong><span>读入直到 0 可视化</span></div>
+<div class="time-block"><b>60–80 分钟</b><strong>循环的代价</strong><span>O(n) 与 O(n²)</span></div>
+<div class="time-block"><b>80–100 分钟</b><strong>输入输出框架</strong><span>多组数据 + EOF</span></div>
+<div class="time-block"><b>100–130 分钟</b><strong>训练 + 刷题</strong><span>3 道训练 + 错因记录</span></div>
+</div>
+
+<h3>学习主线</h3>
+<div class="method-flow">
+<div class="flow-node"><b>for</b>固定次数用 for</div>
+<div class="flow-node"><b>while</b>条件驱动用 while</div>
+<div class="flow-node"><b>do-while</b>至少做一次用它</div>
+<div class="flow-node"><b>输入框架</b>多组数据 + EOF</div>
+</div>
+
+<div class="card warning">
+<div class="mini-title"><span class="icon">⚠</span>先记住一句话</div>
+<p>循环三要素：<strong>初始化、条件、更新</strong>。少写任何一个，循环就可能多跑一次、少跑一次，或者变成死循环。写循环前先在纸上把前 3 次走一遍。</p>
+</div>
+</section>
+
+<section class="lesson" data-section="diagnosis" id="diagnosis">
+<div class="section-top">
+<div>
+<p class="section-kicker">DIAGNOSIS · 摸底</p>
+<h2>预诊断：先看你卡在哪里</h2>
+<p class="lead">共 5 题。凭直觉答完再看反馈。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="pre1">
+<div class="quiz-head"><strong>Q1｜循环执行几次？</strong><span class="pill">for 次数</span></div>
+<div class="quiz-body">
+<p><code>for(i=1; i&lt;=n; i++)</code> 这个循环体会执行几次？</p>
+<div class="options">
+<label class="option"><input name="pre1" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">n-1 次</span></span></label>
+<label class="option"><input name="pre1" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">n 次</span></span></label>
+<label class="option"><input name="pre1" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">n+1 次</span></span></label>
+<label class="option"><input name="pre1" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">无穷次</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="pre2">
+<div class="quiz-head"><strong>Q2｜累加的结果</strong><span class="pill">累加</span></div>
+<div class="quiz-body">
+<p>运行下面代码，输出是：</p>
+<div class="code-block" style="margin:10px 0"><div class="code-body"><pre><code class="language-c">int i, s = 0;
+for (i = 1; i &lt;= 10; i++) s += i;
+printf("%d\n", s);</code></pre></div></div>
+<div class="options">
+<label class="option"><input name="pre2" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer"><span class="mono">50</span></span></span></label>
+<label class="option"><input name="pre2" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer"><span class="mono">55</span></span></span></label>
+<label class="option"><input name="pre2" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer"><span class="mono">45</span></span></span></label>
+<label class="option"><input name="pre2" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer"><span class="mono">10</span></span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="pre3">
+<div class="quiz-head"><strong>Q3｜while 执行几次？</strong><span class="pill">while</span></div>
+<div class="quiz-body">
+<p><code>int i=1; while(i&lt;=5) i++;</code> 循环体 <code>i++</code> 执行几次？</p>
+<div class="options">
+<label class="option"><input name="pre3" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">4 次</span></span></label>
+<label class="option"><input name="pre3" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">5 次</span></span></label>
+<label class="option"><input name="pre3" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">6 次</span></span></label>
+<label class="option"><input name="pre3" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">0 次</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="A" data-quiz="pre4">
+<div class="quiz-head"><strong>Q4｜do-while 的特性</strong><span class="pill">do-while</span></div>
+<div class="quiz-body">
+<p>do-while 与 while 最大的区别是：</p>
+<div class="options">
+<label class="option"><input name="pre4" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">循环体至少执行一次</span></span></label>
+<label class="option"><input name="pre4" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">循环体一次都不执行</span></span></label>
+<label class="option"><input name="pre4" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">只能用于累加</span></span></label>
+<label class="option"><input name="pre4" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">没有条件判断</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="pre5">
+<div class="quiz-head"><strong>Q5｜循环里的输出</strong><span class="pill">循环 + 判断</span></div>
+<div class="quiz-body">
+<p>运行下面代码，输出是：</p>
+<div class="code-block" style="margin:10px 0"><div class="code-body"><pre><code class="language-c">for (i = 1; i &lt;= 5; i++)
+  if (i % 2 == 0) printf("%d ", i);</code></pre></div></div>
+<div class="options">
+<label class="option"><input name="pre5" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer"><span class="mono">1 3 5</span></span></span></label>
+<label class="option"><input name="pre5" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer"><span class="mono">2 4</span></span></span></label>
+<label class="option"><input name="pre5" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer"><span class="mono">1 2 3 4 5</span></span></span></label>
+<label class="option"><input name="pre5" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer"><span class="mono">2 4 6 8 10</span></span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="loop-for" id="loop-for">
+<div class="section-top">
+<div>
+<p class="section-kicker">2.1 · FOR</p>
+<h2>for 循环：固定次数重复</h2>
+<p class="lead">「让某段代码执行 n 次」是循环最常用的场景，for 循环就是为它设计的。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. for 的三要素</h3>
+<p>for 循环的结构是 <code>for(初始化; 条件; 更新)</code>，执行顺序是：<strong>初始化 → 判断条件 →（成立则执行循环体）→ 更新 → 再判断…</strong></p>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 2-2 · 输出 1 到 n</span><span class="code-lang">C</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-c">int n, i;
+scanf("%d", &amp;n);
+for (i = 1; i &lt;= n; i++)
+  printf("%d\n", i);</code></pre></div>
+</div>
+<p>i 从 1 数到 n，每数一个数就输出一次，一共输出 n 个数。<strong>最容易错的是边界</strong>：<code>i &lt;= n</code> 会执行 n 次，写成 <code>i &lt; n</code> 就只有 n-1 次。</p>
+
+<h3>2. 累加：s += i</h3>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 2-3 · 计算 1+2+…+n</span><span class="code-lang">C</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-c">int n, i, s = 0;       /* 累加器要先清零 */
+scanf("%d", &amp;n);
+for (i = 1; i &lt;= n; i++)
+  s += i;              /* s = s + i */
+printf("%d\n", s);</code></pre></div>
+</div>
+<p>累加器 <code>s</code> 的初值必须是 0。这个「先清零、再累加」的模式后面会反复出现（求和、计数、找最值……）。</p>
+
+<h3>3. 可视化：for 循环一步一步跑</h3>
+<div class="exec-stage" id="sumStage">
+<div class="stage-title"><span class="icon">▶</span>计算 1+2+3+4+5 的过程</div>
+<div class="legend">
+<span class="lg"><span class="sw" style="background:var(--sage)"></span>已累加的项</span>
+<span class="lg"><strong id="sumI" style="color:var(--sage-deep)">—</strong> = 循环变量 i</span>
+<span class="lg"><strong id="sumS" style="color:var(--rose)">—</strong> = 累加和 s</span>
+</div>
+<div class="grid-2">
+<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+<span class="sw" data-sum-bar style="width:52px;height:52px;border-radius:12px;border:1px solid var(--line);display:grid;place-items:center;font-weight:800;background:var(--surface)"></span>
+<span class="sw" data-sum-bar style="width:52px;height:52px;border-radius:12px;border:1px solid var(--line);display:grid;place-items:center;font-weight:800;background:var(--surface)"></span>
+<span class="sw" data-sum-bar style="width:52px;height:52px;border-radius:12px;border:1px solid var(--line);display:grid;place-items:center;font-weight:800;background:var(--surface)"></span>
+<span class="sw" data-sum-bar style="width:52px;height:52px;border-radius:12px;border:1px solid var(--line);display:grid;place-items:center;font-weight:800;background:var(--surface)"></span>
+<span class="sw" data-sum-bar style="width:52px;height:52px;border-radius:12px;border:1px solid var(--line);display:grid;place-items:center;font-weight:800;background:var(--surface)"></span>
+</div>
+<div class="exec-log" style="margin-top:0" id="sumLog"></div>
+</div>
+<div class="exec-controls">
+<button class="btn primary" id="sumNext">执行第一次循环</button>
+</div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="quiz-for">
+<div class="quiz-head"><strong>小测｜for 输出</strong><span class="pill">循环次数</span></div>
+<div class="quiz-body">
+<p>运行 <code>for(i=1;i&lt;=3;i++) printf("%d ", i);</code>，输出是：</p>
+<div class="options">
+<label class="option"><input name="quiz-for" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer"><span class="mono">1 2 3 4</span></span></span></label>
+<label class="option"><input name="quiz-for" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer"><span class="mono">1 2 3</span></span></span></label>
+<label class="option"><input name="quiz-for" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer"><span class="mono">0 1 2 3</span></span></span></label>
+<label class="option"><input name="quiz-for" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer"><span class="mono">2 3 4</span></span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="quiz-sum">
+<div class="quiz-head"><strong>小测｜累加结果</strong><span class="pill">累加</span></div>
+<div class="quiz-body">
+<p>运行 <code>for(i=1;i&lt;=5;i++) s += i;</code>（s 初值为 0）后，输出是：</p>
+<div class="options">
+<label class="option"><input name="quiz-sum" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer"><span class="mono">10</span></span></span></label>
+<label class="option"><input name="quiz-sum" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer"><span class="mono">15</span></span></span></label>
+<label class="option"><input name="quiz-sum" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer"><span class="mono">20</span></span></span></label>
+<label class="option"><input name="quiz-sum" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer"><span class="mono">5</span></span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="loop-while" id="loop-while">
+<div class="section-top">
+<div>
+<p class="section-kicker">2.2 · WHILE</p>
+<h2>while 与 do-while：条件说了算</h2>
+<p class="lead">不知道循环多少次，但知道「什么时候停」——这种情况交给 while。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. while：先判断，再执行</h3>
+<p>while 每次执行前都检查条件，条件为真才执行循环体。如果一开始条件就不成立，循环体<strong>一次都不执行</strong>。</p>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 2-4 · 读入数字直到遇到 0</span><span class="code-lang">C</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-c">int x;
+scanf("%d", &amp;x);
+while (x != 0) {      /* 0 是结束标记 */
+  printf("处理：%d\n", x);
+  scanf("%d", &amp;x);   /* 再读下一个 */
+}</code></pre></div>
+</div>
+<p>这里「以 0 结尾」是数据约定。while 的常见配套习惯：<strong>在循环体末尾更新条件变量</strong>，否则会死循环。</p>
+
+<h3>2. do-while：先执行一次再说</h3>
+<p>do-while 先执行循环体，再判断条件，因此<strong>至少执行一次</strong>。适合「必须先做一次，再看要不要继续」的场景。</p>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 2-5 · 至少输出一次</span><span class="code-lang">C</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-c">int x;
+do {
+  printf("你输入的是 %d\n", x);
+  scanf("%d", &amp;x);
+} while (x != 0);</code></pre></div>
+</div>
+
+<h3>3. 可视化：读到 0 为止</h3>
+<div class="exec-stage" id="readStage">
+<div class="stage-title"><span class="icon">▶</span>while(x != 0) 读取过程</div>
+<div class="exec-log" id="readLog" style="margin-top:0">初始化：读入第一个数。</div>
+<div class="exec-controls">
+<button class="btn primary" id="readNext">读下一个数</button>
+<strong id="readVal" style="color:var(--sage-deep);font-size:22px">5</strong>
+</div>
+</div>
+
+<div class="card warning">
+<div class="mini-title"><span class="icon">⚠</span>死循环排查</div>
+<p>程序卡住不动、一直刷屏，多半是死循环。先在循环体里加一句 <code>printf("i=%d\n", i);</code> 看变量是怎么变的，通常一眼就能看出「条件永远为真」的原因。</p>
+</div>
+</section>
+
+<section class="lesson" data-section="loop-cost" id="loop-cost">
+<div class="section-top">
+<div>
+<p class="section-kicker">2.3 · COST</p>
+<h2>循环的代价：你的程序要跑多久</h2>
+<p class="lead">循环越深、越慢。学会估算循环次数，是后面学习「高效算法」的起点。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. 数循环次数</h3>
+<p>一层循环跑 $n$ 次，工作量记为 $O(n)$；两层嵌套循环，外层 $n$ 次、内层 $n$ 次，总共约 $n \times n = n^2$ 次，记为 $O(n^2)$。现代评测机一秒大约能跑 $10^8$ 次简单操作，超过这个量级就会超时。</p>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 2-6 · 嵌套循环：输出乘法表的一部分</span><span class="code-lang">C</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-c">int i, j;
+for (i = 1; i &lt;= 3; i++)      /* 外层 3 次 */
+  for (j = 1; j &lt;= 3; j++)    /* 内层 3 次 */
+    printf("%d*%d=%d\n", i, j, i * j);  /* 共 3×3=9 行 */</code></pre></div>
+</div>
+
+<h3>2. 一张表记住量级</h3>
+<div class="grid-2">
+<div class="card"><div class="mini-title"><span class="icon">O</span>$O(n)$：线性</div><p>n=10⁶ 的简单循环没问题，约 1 秒。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">O</span>$O(n^2)$：平方</div><p>n=10⁴ 就到 10⁸ 了，再大就要超时。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">O</span>$O(n \log n)$</div><p>排序等常用算法的量级，n=10⁶ 也很快。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">O</span>避免无用重复</div><p>能在循环外算的，别放循环里算。</p></div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="quiz-nested">
+<div class="quiz-head"><strong>小测｜嵌套循环次数</strong><span class="pill">O(n²)</span></div>
+<div class="quiz-body">
+<p>下面代码中 printf 一共执行多少次？</p>
+<div class="code-block" style="margin:10px 0"><div class="code-body"><pre><code class="language-c">for (i = 1; i &lt;= 3; i++)
+  for (j = 1; j &lt;= 3; j++)
+    printf("*");</code></pre></div></div>
+<div class="options">
+<label class="option"><input name="quiz-nested" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">3 次</span></span></label>
+<label class="option"><input name="quiz-nested" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">9 次</span></span></label>
+<label class="option"><input name="quiz-nested" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">6 次</span></span></label>
+<label class="option"><input name="quiz-nested" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">12 次</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="io-frame" id="io-frame">
+<div class="section-top">
+<div>
+<p class="section-kicker">2.4 · I/O</p>
+<h2>输入输出框架：多组数据怎么办</h2>
+<p class="lead">OJ 题目经常不告诉你「有几组数据」，而是让你读到文件尾（EOF）。这一节给出标准写法。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. scanf 的返回值</h3>
+<p>scanf 的返回值是<strong>成功读入的变量个数</strong>。如果输入流已经到末尾、什么都读不到，它返回 <code>EOF</code>（一个负数）。利用这一点，可以写出「一直读到文件尾」的循环：</p>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 2-7 · 多组数据：两个数求和，读到文件尾</span><span class="code-lang">C</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main() {
+  int a, b;
+  while (scanf("%d%d", &amp;a, &amp;b) == 2) {
+    printf("%d\n", a + b);
+  }
+  return 0;
+}</code></pre></div>
+</div>
+<p>读入 2 个变量成功就进入循环；一旦读不到（EOF），<code>scanf</code> 返回不是 2，循环自然结束。<strong>这是竞赛里最常用的输入框架之一。</strong></p>
+
+<div class="quiz" data-correct="A" data-quiz="quiz-eof">
+<div class="quiz-head"><strong>小测｜EOF 框架</strong><span class="pill">输入输出</span></div>
+<div class="quiz-body">
+<p><code>while(scanf("%d",&amp;x)==1)</code> 的含义是：</p>
+<div class="options">
+<label class="option"><input name="quiz-eof" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">成功读入一个整数就处理，读到文件尾结束</span></span></label>
+<label class="option"><input name="quiz-eof" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">永远循环，停不下来</span></span></label>
+<label class="option"><input name="quiz-eof" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">只处理一组数据</span></span></label>
+<label class="option"><input name="quiz-eof" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">x 等于 1 时才处理</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="collapse-wrap">
+<button class="collapse-head" data-collapse="io-why"><span class="chev">▶</span>为什么用 while 而不是 for？<span style="margin-left:auto;color:var(--muted);font-weight:400;font-size:13px">点开看推理</span></button>
+<div class="collapse-body" id="io-why">
+<p>因为数据的组数我们不知道：可能是 1 组，也可能是 10 万组。for 需要「提前知道次数」，而 while 只看条件——「还能读到吗？能就读」，天然适合处理数量未知的输入。</p>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="practice" id="practice">
+<div class="section-top">
+<div>
+<p class="section-kicker">2.5 · TRAINING</p>
+<h2>本章训练：限时检验真实掌握</h2>
+<p class="lead">三题闭卷完成，先写答案再核对；错了就把原因写进「错因记录」。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<div class="practice-card">
+<div class="practice-meta"><span class="pill core">训练 1 · 程序输出</span><span class="pill">累加</span></div>
+<h3>写出运行结果</h3>
+<p>运行下面代码，输出什么？</p>
+<div class="code-block" style="margin:10px 0"><div class="code-body"><pre><code class="language-c">int i, s = 0;
+for (i = 1; i &lt;= 5; i++) s += i;
+printf("%d\n", s);</code></pre></div></div>
+<div class="answer-row">
+<input type="text" data-save="p1-answer" placeholder="输入你的答案"/>
+<button class="btn small primary" onclick="checkNumeric('p1-answer', 15, 'fb-p1', '正确！1+2+3+4+5=15。', '不对。累加 1 到 5，结果是 15。')">检查</button>
+</div>
+<div aria-live="polite" class="feedback" id="fb-p1"></div>
+<div class="practice-actions">
+<button class="btn small" data-reveal="p1-solution">查看答案</button>
+<button class="btn small" data-reveal="p1-hint">查看提示</button>
+</div>
+<div class="hint" id="p1-hint">s 的初值是 0，i 从 1 加到 5，每步 s += i。</div>
+<div class="solution" id="p1-solution">输出 <span class="mono">15</span>。</div>
+</div>
+
+<div class="practice-card">
+<div class="practice-meta"><span class="pill core">训练 2 · 程序输出</span><span class="pill">循环 + 平方</span></div>
+<h3>写出运行结果</h3>
+<p>运行下面代码，输出什么？（注意空格）</p>
+<div class="code-block" style="margin:10px 0"><div class="code-body"><pre><code class="language-c">for (i = 1; i &lt;= 3; i++)
+  printf("%d ", i * i);</code></pre></div></div>
+<div class="answer-row">
+<input type="text" data-save="p2-answer" placeholder="例如：1 4 9"/>
+<button class="btn small primary" onclick="checkExact('p2-answer', '1 4 9', 'fb-p2', '正确！1²、2²、3² 分别是 1、4、9。', '还不对。i=1,2,3 时输出 i*i，即 1、4、9，中间有空格。')">检查</button>
+</div>
+<div aria-live="polite" class="feedback" id="fb-p2"></div>
+<div class="practice-actions">
+<button class="btn small" data-reveal="p2-solution">查看答案</button>
+<button class="btn small" data-reveal="p2-hint">查看提示</button>
+</div>
+<div class="hint" id="p2-hint">i 从 1 到 3，输出 i×i。</div>
+<div class="solution" id="p2-solution">输出 <span class="mono">1 4 9</span>。</div>
+</div>
+
+<div class="practice-card">
+<div class="practice-meta"><span class="pill core">训练 3 · 填空计算</span><span class="pill">累加公式</span></div>
+<h3>写出运行结果</h3>
+<p>用循环计算 $1+2+\dots+100$，结果是多少？（先心算/手算，再验证）</p>
+<div class="answer-row">
+<input type="text" data-save="p3-answer" placeholder="输入数值"/>
+<button class="btn small primary" onclick="checkNumeric('p3-answer', 5050, 'fb-p3', '正确！1+2+...+100=5050。', '不对。等差数列求和：(1+100)×100÷2 = 5050。')">检查</button>
+</div>
+<div aria-live="polite" class="feedback" id="fb-p3"></div>
+<div class="practice-actions">
+<button class="btn small" data-reveal="p3-solution">查看答案</button>
+<button class="btn small" data-reveal="p3-hint">查看提示</button>
+</div>
+<div class="hint" id="p3-hint">可以用公式 $(1+100) \times 100 / 2$，也可以用循环模拟。</div>
+<div class="solution" id="p3-solution">答案是 <span class="mono">5050</span>。高斯公式：首项加末项乘以项数除以 2。</div>
+</div>
+
+<h3>刷题清单：把循环用到赛场上</h3>
+<p>这 8 道题专门练「循环次数、累加、多组输入」：</p>
+<div class="oj-grid">
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P1008" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P1008</span></div>
+<h4>三连击</h4>
+<p>用 1~9 组成三个三位数，比例为 1:2:3。</p>
+<p class="oj-why">为什么做：循环枚举 + 条件判断的综合练习，暴力的第一课。</p>
+</a>
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P1420" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P1420</span></div>
+<h4>最长连号</h4>
+<p>在一串数里找最长的连续递增段。</p>
+<p class="oj-why">为什么做：边读边统计，练「维护一个当前值」的循环技巧。</p>
+</a>
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P5718" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P5718</span></div>
+<h4>找最小值</h4>
+<p>读 n 个数，输出最小值。</p>
+<p class="oj-why">为什么做：累加器模式的变体「最值变量」，先初始化成很大/很小再比较。</p>
+</a>
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P5727" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P5727</span></div>
+<h4>冰雹猜想</h4>
+<p>奇数×3+1、偶数÷2，直到变成 1，输出过程。</p>
+<p class="oj-why">为什么做：while 循环「直到条件满足」的经典练习。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/1/A" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">1A</span></div>
+<h4>Theatre Square</h4>
+<p>铺地板，求需要多少块方砖。</p>
+<p class="oj-why">为什么做：向上取整 + 乘法的数学题，注意用 long long。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/50/A" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">50A</span></div>
+<h4>Domino piling</h4>
+<p>棋盘上最多能放多少个 1×2 多米诺。</p>
+<p class="oj-why">为什么做：整除与取整的实际应用。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/281/A" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">281A</span></div>
+<h4>Word Capitalization</h4>
+<p>把单词首字母转大写。</p>
+<p class="oj-why">为什么做：字符处理 + 条件判断，为第3章字符串打底。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/112/A" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">112A</span></div>
+<h4>Petya and Strings</h4>
+<p>忽略大小写比较两个字符串。</p>
+<p class="oj-why">为什么做：字典序比较思路，第3章学完字符串再回来秒杀它。</p>
+</a>
+</div>
+
+<h3>错因记录</h3>
+<p>今天做错的题、踩过的坑，写在这里。</p>
+<textarea data-save="mistake-log" placeholder="例：for(i=1;i<n;i++) 少循环了一次，应该是 i<=n……"></textarea>
+</section>
+
+<section class="lesson" data-section="finish" id="finish">
+<div class="section-top">
+<div>
+<p class="section-kicker">FINISH · 通关</p>
+<h2>今日通关总结</h2>
+<p class="lead">先闭卷完成下面两项，再看掌握度。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>要点自检</h3>
+<div class="checklist">
+<label class="check-item"><input type="checkbox" data-save-check="c1"/><span>我能数清任意 for 循环执行了几次，包括嵌套循环。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c2"/><span>我会用 <code>s += i</code> 做累加，并记得把累加器初始化为 0。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c3"/><span>我理解 while 与 do-while 的区别，知道各自什么时候用。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c4"/><span>我会用 <code>while(scanf(...) == 1)</code> 处理多组数据直到 EOF。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c5"/><span>我能大致估算一个程序是 O(n) 还是 O(n²)，并判断会不会超时。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c6"/><span>我已经在洛谷或 Codeforces 上 AC 了一道循环题。</span></label>
+</div>
+
+<h3>闭卷写出「方法口诀」</h3>
+<p>写循环先想三要素：<strong>初始化、<input type="text" data-save="finish-method" placeholder="两个字" style="display:inline-block;width:110px;min-height:38px;padding:6px 10px"/>、更新</strong>。</p>
+<button class="btn small primary" onclick="checkExact('finish-method', '条件', 'fb-method', '正确！初始化、条件、更新。', '答案是两个字：条件。')">检查</button>
+<div aria-live="polite" class="feedback" id="fb-method"></div>
+
+<h3>用一句话总结本章</h3>
+<textarea data-save="final-summary" placeholder="例：这章我学会了累加和多组输入，最大的坑是循环边界差一……"></textarea>
+
+<div class="score-panel" style="margin-top:22px">
+<div class="card" style="display:grid;place-items:center;text-align:center">
+<div class="score-ring" id="scoreRing"><span id="scoreValue">0%</span></div>
+<p style="color:var(--muted);font-size:14px;margin:10px 0 0">本章掌握度 = 测验25% + 进度25% + 自检25% + 训练25%</p>
+</div>
+<div class="card">
+<h3 style="margin-top:0">当前水平</h3>
+<p id="levelText" style="font-size:18px;color:var(--ink-soft)">还没开始？完成上面的题目后这里会显示你的掌握度。</p>
+<div class="practice-actions">
+<button class="btn primary" id="exportBtn2" onclick="exportRecord()">导出学习记录</button>
+<button class="btn danger" onclick="resetAllProgress()">清空本页进度</button>
+</div>
+<p style="color:var(--muted);font-size:14px;margin-top:12px">提示：学习记录会保存成 txt 文件，方便你复盘。</p>
+</div>
+</div>
+</section>
+
+<footer>
+<p>本站内容为原创讲解与原创示例代码，知识体系参考《算法竞赛入门经典（第2版）》刘汝佳 著。</p>
+<p><a href="../../index.html">返回章节总览</a> · 下一章：<a href="../ch03/index.html">第3章 数组和字符串</a></p>
+</footer>
+</div>
+</main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<script src="../../assets/js/ch02.js"></script>
+<script src="../../assets/js/lesson.js"></script>
+</body>
+</html>
+
+
