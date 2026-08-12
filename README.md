@@ -4,19 +4,18 @@
 
 ## 站点结构
 
-- `index.html` — 首页：学习路线、章节地图、刷题平台指引
-- `chapters/ch01/index.html` — 第1章《程序设计入门》
-- `chapters/ch02/index.html` — 第2章《循环结构程序设计》
-- `chapters/ch03/index.html` — 第3章《数组和字符串》
-- `chapters/ch04/index.html` — 第4章《函数和递归》
-- `chapters/ch05/index.html` — 第5章《C++ 与 STL 入门》
+- `index.html` — 首页：学习路线、章节地图（12 章全部上线）、刷题平台指引
+- `chapters/ch01 ~ ch12/` — 全书 12 章交互课
+  - 语言篇：ch01 程序设计入门 / ch02 循环结构 / ch03 数组和字符串 / ch04 函数和递归 / ch05 C++ 与 STL
+  - 基础篇：ch06 数据结构基础 / ch07 暴力求解法
+  - 竞赛篇：ch08 高效算法设计 / ch09 动态规划初步 / ch10 数学概念与方法 / ch11 图论模型与算法 / ch12 高级专题
 - `assets/css/lesson.css` — 共享课堂样式（莫兰迪纸感 + 明暗双主题）
 - `assets/js/lesson.js` — 共享交互逻辑（计时、进度、测验、导出、重置）
 - `assets/js/ch0X.js` — 各章配置与交互演示
 
-语言篇（第1–5章）已全部上线；基础篇、竞赛篇逐章制作中。
+每章 8 个 section：本章路线 → 预诊断（5 题）→ 4 节核心知识（含可视化）→ 本章训练（3 题 + 8 道刷题清单）→ 通关总结（自检 + 口诀 + 掌握度）。全书 12 章共 96 道配套刷题。
 
-## 新增章节流程
+## 新增内容流程
 
 1. 复制 `chapters/ch01/` 为 `chapters/chXX/`
 2. 复用 `lesson.css` / `lesson.js`，按模板重写内容

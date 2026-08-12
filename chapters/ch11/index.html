@@ -1,0 +1,605 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="description" content="算法竞赛入门 · 第11章《图论模型与算法》交互式学习：最小生成树 Kruskal、最短路 Dijkstra/Floyd、网络流初步。"/>
+<meta content="#F2EFE9" name="theme-color"/>
+<meta content="dark light" name="color-scheme"/>
+<title>第11章 图论模型与算法 · 算法竞赛入门交互课</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg"/>
+<link rel="stylesheet" href="../../assets/css/lesson.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css"/>
+<script>
+window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] } };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<div class="page-grid">
+<aside aria-label="课程导航" class="sidebar">
+<a class="back-link" href="../../index.html">← 返回章节总览</a>
+<div class="brand">
+<div class="brand-mark">AC</div>
+<div><strong>算法入门 Lab</strong><small>第11章 · 图论模型与算法</small></div>
+</div>
+<div class="timer-card">
+<div class="timer-label">本章总计时</div>
+<div class="timer-display" id="timerDisplay">00:00:00</div>
+<div class="timer-actions">
+<button class="btn primary" id="timerStart">开始</button>
+<button class="btn" id="timerPause">暂停</button>
+<button class="btn ghost" id="timerReset">重置计时</button>
+</div>
+</div>
+<div class="progress-wrap">
+<div class="progress-row"><span>课程进度</span><span id="progressText">0 / 8</span></div>
+<div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+</div>
+<div class="nav-title">学习路线</div>
+<nav class="nav-list" id="sideNav">
+<a class="nav-link" href="#plan"><span class="nav-dot"></span>0. 本章路线</a>
+<a class="nav-link" href="#diagnosis"><span class="nav-dot"></span>1. 预诊断</a>
+<a class="nav-link" href="#mst"><span class="nav-dot"></span>2. 最小生成树</a>
+<a class="nav-link" href="#shortest"><span class="nav-dot"></span>3. 最短路</a>
+<a class="nav-link" href="#flow"><span class="nav-dot"></span>4. 网络流初步</a>
+<a class="nav-link" href="#summary"><span class="nav-dot"></span>5. 总结与展望</a>
+<a class="nav-link" href="#practice"><span class="nav-dot"></span>6. 本章训练</a>
+<a class="nav-link" href="#finish"><span class="nav-dot"></span>7. 通关总结</a>
+</nav>
+<div class="side-tools">
+<button class="btn small" id="themeToggle">切换夜雾</button>
+<button class="btn small" id="exportBtn">导出记录</button>
+</div>
+</aside>
+<main>
+<div class="mobile-bar">
+<button class="btn small primary" id="mobileStart">开始</button>
+<span class="mobile-timer" id="mobileTimer">00:00:00</span>
+<button class="btn small" id="mobilePause">暂停</button>
+<button class="btn small" id="mobileTheme">主题</button>
+</div>
+<div class="content">
+<header class="hero">
+<div class="hero-copy">
+<span class="eyebrow">CHAPTER 11 · 竞赛篇</span>
+<h1>图论模型与算法</h1>
+<p>图论是 ACM 的「主战场」之一：<strong>最小生成树</strong>省钱，<strong>最短路</strong>求最快，<strong>网络流</strong>管最大运输量。这一章把它们装进你的代码库。</p>
+<div class="hero-tags">
+<span class="tag">Kruskal + 并查集</span>
+<span class="tag">Dijkstra 堆优化</span>
+<span class="tag">Floyd 全源</span>
+<span class="tag">网络流概念</span>
+<span class="tag">算法逐步可视化</span>
+</div>
+<div class="hero-actions">
+<a class="btn primary" href="#plan">开始本章学习</a>
+<button class="btn" onclick="document.getElementById('mst').scrollIntoView()">直接进入核心知识</button>
+</div>
+</div>
+<div aria-label="Dijkstra 示例" class="hero-visual">
+<div class="code-block" style="box-shadow:none;border:1px solid var(--line)">
+<div class="code-head"><span class="code-title">程序 11-1 · Dijkstra 堆优化</span><span class="code-lang">C++</span></div>
+<div class="code-body"><pre><code class="language-cpp">priority_queue&lt;pair&lt;int,int&gt;, vector&lt;pair&lt;int,int&gt;&gt;, greater&lt;&gt;&gt; pq;
+dist[s] = 0; pq.push({0, s});
+while (!pq.empty()) {
+  auto [d, u] = pq.top(); pq.pop();
+  if (d != dist[u]) continue;      /* 过期数据，跳过 */
+  for (auto [v, w] : g[u])
+    if (dist[u] + w &lt; dist[v]) {
+      dist[v] = dist[u] + w;
+      pq.push({dist[v], v});
+    }
+}</code></pre></div>
+</div>
+</div>
+</header>
+
+<section class="lesson" data-section="plan" id="plan">
+<div class="section-top">
+<div>
+<p class="section-kicker">PLAN · 路线</p>
+<h2>本章怎么学</h2>
+<p class="lead">学完本章，你会写 Kruskal 求最小生成树、Dijkstra 与 Floyd 求最短路，并理解网络流的基本概念与建模。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>五个学习目标</h3>
+<div class="grid-3">
+<div class="card"><div class="mini-title"><span class="icon">1</span>并查集</div><p>Kruskal 的搭档：判断两个点是否连通。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">2</span>最小生成树</div><p>Kruskal：按边权排序 + 并查集加边。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">3</span>Dijkstra</div><p>单源最短路，堆优化 $O((n+m)\log n)$。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">4</span>Floyd</div><p>全源最短路，$O(n^3)$，代码极短。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">5</span>网络流</div><p>最大流建模：源点 → 汇点。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">6</span>建图</div><p>把现实问题翻译成图（节点、边、权）。</p></div>
+</div>
+
+<h3>建议时间安排</h3>
+<div class="timeline">
+<div class="time-block"><b>0–10 分钟</b><strong>预诊断</strong><span>5 题摸清起点</span></div>
+<div class="time-block"><b>10–45 分钟</b><strong>最小生成树</strong><span>Kruskal 可视化</span></div>
+<div class="time-block"><b>45–80 分钟</b><strong>Dijkstra</strong><span>松弛过程可视化</span></div>
+<div class="time-block"><b>80–100 分钟</b><strong>Floyd</strong><span>全源最短路</span></div>
+<div class="time-block"><b>100–120 分钟</b><strong>网络流</strong><span>概念与建模</span></div>
+<div class="time-block"><b>120–145 分钟</b><strong>训练 + 刷题</strong><span>3 道训练 + 错因记录</span></div>
+</div>
+
+<h3>学习主线</h3>
+<div class="method-flow">
+<div class="flow-node"><b>建模</b>问题 → 图</div>
+<div class="flow-node"><b>MST</b>Kruskal</div>
+<div class="flow-node"><b>最短路</b>Dijkstra / Floyd</div>
+<div class="flow-node"><b>网络流</b>最大流</div>
+</div>
+
+<div class="card warning">
+<div class="mini-title"><span class="icon">⚠</span>先记住一句话</div>
+<p>图论题 90% 的时间花在<strong>建图</strong>上：节点是什么、边是什么、权值代表什么。模型建对了，剩下的就是套模板。所以先读题、画图，再写代码。</p>
+</div>
+</section>
+
+<section class="lesson" data-section="diagnosis" id="diagnosis">
+<div class="section-top">
+<div>
+<p class="section-kicker">DIAGNOSIS · 摸底</p>
+<h2>预诊断：先看你卡在哪里</h2>
+<p class="lead">共 5 题。凭直觉答完再看反馈。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<div class="quiz" data-correct="A" data-quiz="pre1">
+<div class="quiz-head"><strong>Q1｜Kruskal 的思路</strong><span class="pill">MST</span></div>
+<div class="quiz-body">
+<p>Kruskal 求最小生成树的核心是：</p>
+<div class="options">
+<label class="option"><input name="pre1" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">按边权从小到大，用并查集判断是否成环，不成环就加</span></span></label>
+<label class="option"><input name="pre1" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">随便选 n-1 条边</span></span></label>
+<label class="option"><input name="pre1" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">从最大的边开始删</span></span></label>
+<label class="option"><input name="pre1" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">用 BFS 遍历所有边</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="A" data-quiz="pre2">
+<div class="quiz-head"><strong>Q2｜Dijkstra 每次选谁</strong><span class="pill">最短路</span></div>
+<div class="quiz-body">
+<p>Dijkstra 每次从「未确定」的点里选择：</p>
+<div class="options">
+<label class="option"><input name="pre2" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">当前距离最小的点</span></span></label>
+<label class="option"><input name="pre2" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">编号最小的点</span></span></label>
+<label class="option"><input name="pre2" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">边权最大的点</span></span></label>
+<label class="option"><input name="pre2" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">任意一个点</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="pre3">
+<div class="quiz-head"><strong>Q3｜Floyd 的复杂度</strong><span class="pill">Floyd</span></div>
+<div class="quiz-body">
+<p>Floyd 求所有点对最短路的时间复杂度是：</p>
+<div class="options">
+<label class="option"><input name="pre3" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">$O(n^2)$</span></span></label>
+<label class="option"><input name="pre3" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">$O(n^3)$</span></span></label>
+<label class="option"><input name="pre3" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">$O(n \log n)$</span></span></label>
+<label class="option"><input name="pre3" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">$O(nm)$</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="A" data-quiz="pre4">
+<div class="quiz-head"><strong>Q4｜最大流</strong><span class="pill">网络流</span></div>
+<div class="quiz-body">
+<p>最大流问题求的是：</p>
+<div class="options">
+<label class="option"><input name="pre4" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">从源点到汇点能输送的最大流量</span></span></label>
+<label class="option"><input name="pre4" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">流量最小的路径</span></span></label>
+<label class="option"><input name="pre4" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">点的个数</span></span></label>
+<label class="option"><input name="pre4" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">最短路径长度</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="A" data-quiz="pre5">
+<div class="quiz-head"><strong>Q5｜最小生成树</strong><span class="pill">MST</span></div>
+<div class="quiz-body">
+<p>最小生成树（MST）是：</p>
+<div class="options">
+<label class="option"><input name="pre5" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">连接所有点且总边权最小的 n-1 条边</span></span></label>
+<label class="option"><input name="pre5" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">包含所有边的一棵树</span></span></label>
+<label class="option"><input name="pre5" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">从源点到汇点的一条路</span></span></label>
+<label class="option"><input name="pre5" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">最大生成树</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="mst" id="mst">
+<div class="section-top">
+<div>
+<p class="section-kicker">11.1 · MST</p>
+<h2>最小生成树：Kruskal</h2>
+<p class="lead">n 个城市要连成网，怎样总造价最低？答案就是最小生成树（MST）。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. 并查集 + Kruskal</h3>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 11-2 · Kruskal</span><span class="code-lang">C++</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-cpp">struct Edge { int u, v, w; };
+bool cmp(Edge a, Edge b) { return a.w &lt; b.w; }
+int find(int x) { return p[x] == x ? x : p[x] = find(p[x]); }
+
+sort(edges, edges + m, cmp);   /* 按权值排序 */
+for (auto e : edges) {
+  int ru = find(e.u), rv = find(e.v);
+  if (ru != rv) {              /* 不成环 */
+    p[ru] = rv;                /* 合并集合 */
+    ans += e.w; cnt++;
+    if (cnt == n - 1) break;   /* 选够 n-1 条 */
+  }
+}</code></pre></div>
+</div>
+<p>为什么从小到大贪心是对的：<strong>如果某条权最小的边不进 MST，把它加进去一定能找到一条更优或不差的方案</strong>——这就是「贪心正确性」的交换论证。</p>
+
+<h3>2. 可视化：4 个点、5 条边</h3>
+<div class="exec-stage" id="kruskalStage">
+<div class="stage-title"><span class="icon">▶</span>Kruskal 加边过程（按权从小到大）</div>
+<div id="kruskalRows" style="display:grid;gap:6px;margin-top:4px"></div>
+<div class="exec-log" id="kruskalLog" style="margin-top:8px"></div>
+<div class="exec-controls">
+<button class="btn primary" id="kruskalNext">考虑下一条边</button>
+<strong id="kruskalSum" style="color:var(--sage-deep);font-size:15px"></strong>
+</div>
+</div>
+<style>[data-kruskal-row]{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:8px 12px;font-weight:700;font-family:ui-monospace,Consolas,monospace}[data-kruskal-row].chosen{background:var(--sage-soft);border-color:var(--sage)}[data-kruskal-row].current{background:var(--rose-soft);border-color:var(--rose)}</style>
+
+<div class="quiz" data-correct="A" data-quiz="quiz-mst">
+<div class="quiz-head"><strong>小测｜MST 总权</strong><span class="pill">Kruskal</span></div>
+<div class="quiz-body">
+<p>4 个点，边 (1,2)权1、(3,4)权2、(2,3)权3、(1,3)权4、(2,4)权5，最小生成树总权是：</p>
+<div class="options">
+<label class="option"><input name="quiz-mst" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer"><span class="mono">6</span></span></span></label>
+<label class="option"><input name="quiz-mst" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer"><span class="mono">7</span></span></span></label>
+<label class="option"><input name="quiz-mst" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer"><span class="mono">8</span></span></span></label>
+<label class="option"><input name="quiz-mst" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer"><span class="mono">15</span></span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="shortest" id="shortest">
+<div class="section-top">
+<div>
+<p class="section-kicker">11.2 · SHORTEST</p>
+<h2>最短路：Dijkstra 与 Floyd</h2>
+<p class="lead">「从 A 到 B 最快怎么走」是图论最经典的模型。正权图用 Dijkstra，全源用 Floyd，负权用 Bellman-Ford。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. Dijkstra：单源最短路</h3>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 11-3 · Dijkstra（朴素版）</span><span class="code-lang">C++</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-cpp">int dist[N]; bool done[N];
+memset(dist, 0x3f, sizeof(dist));   /* 大数表示无穷 */
+dist[s] = 0;
+for (int k = 0; k &lt; n; k++) {
+  int u = -1;
+  for (int i = 1; i &lt;= n; i++)
+    if (!done[i] &amp;&amp; (u == -1 || dist[i] &lt; dist[u])) u = i;  /* 找最小 */
+  done[u] = true;
+  for (auto [v, w] : g[u])
+    dist[v] = min(dist[v], dist[u] + w);   /* 松弛 */
+}</code></pre></div>
+</div>
+<p>堆优化版把「找最小」换成优先队列，复杂度降到 $O((n+m)\log n)$，是比赛标配。Dijkstra 要求<strong>边权非负</strong>。</p>
+
+<h3>2. 可视化：Dijkstra 松弛过程</h3>
+<div class="exec-stage" id="dijStage">
+<div class="stage-title"><span class="icon">▶</span>Dijkstra（起点 1，边 1-2:2、1-3:4、2-4:4、3-4:3、3-5:5、4-5:1）</div>
+<div id="dijCells" style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap"></div>
+<div class="legend">
+<span class="lg"><span class="sw" style="background:var(--sage)"></span>已确定</span>
+<span class="lg"><span class="sw" style="background:var(--rose)"></span>当前处理</span>
+</div>
+<div class="exec-log" id="dijLog" style="margin-top:8px"></div>
+<div class="exec-controls">
+<button class="btn primary" id="dijNext">确定下一个点</button>
+</div>
+</div>
+<style>[data-dij-cell]{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:10px 12px;font-weight:800;font-family:ui-monospace,Consolas,monospace;text-align:center}[data-dij-cell]::before{content:attr(data-node)" → ";color:var(--muted);font-weight:400;font-size:12px}[data-dij-cell].done{background:var(--sage-soft);border-color:var(--sage)}[data-dij-cell].current{background:var(--rose);color:#fff}</style>
+
+<h3>3. Floyd：全源最短路（代码极短）</h3>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 11-4 · Floyd</span><span class="code-lang">C++</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-cpp">for (int k = 1; k &lt;= n; k++)          /* 中转点 */
+  for (int i = 1; i &lt;= n; i++)
+    for (int j = 1; j &lt;= n; j++)
+      if (d[i][k] + d[k][j] &lt; d[i][j])
+        d[i][j] = d[i][k] + d[k][j];</code></pre></div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="quiz-dijkstra">
+<div class="quiz-head"><strong>小测｜Dijkstra 结果</strong><span class="pill">最短路</span></div>
+<div class="quiz-body">
+<p>上面图中 1 到 4 的最短距离是：</p>
+<div class="options">
+<label class="option"><input name="quiz-dijkstra" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer"><span class="mono">5</span></span></span></label>
+<label class="option"><input name="quiz-dijkstra" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer"><span class="mono">6</span>（1→2→4 = 2+4）</span></span></label>
+<label class="option"><input name="quiz-dijkstra" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer"><span class="mono">7</span>（1→3→4）</span></span></label>
+<label class="option"><input name="quiz-dijkstra" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer"><span class="mono">3</span></span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="quiz-floyd">
+<div class="quiz-head"><strong>小测｜Floyd 的作用</strong><span class="pill">Floyd</span></div>
+<div class="quiz-body">
+<p>Floyd 适合解决：</p>
+<div class="options">
+<label class="option"><input name="quiz-floyd" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">只求一个源点的最短路</span></span></label>
+<label class="option"><input name="quiz-floyd" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">所有点对之间的最短路（n 较小时）</span></span></label>
+<label class="option"><input name="quiz-floyd" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">求最小生成树</span></span></label>
+<label class="option"><input name="quiz-floyd" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">拓扑排序</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="flow" id="flow">
+<div class="section-top">
+<div>
+<p class="section-kicker">11.3 · FLOW</p>
+<h2>网络流初步：最大流</h2>
+<p class="lead">水管网络里，从水源到用户最多能送多少水？这就是最大流问题。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. 基本概念</h3>
+<div class="grid-2">
+<div class="card"><div class="mini-title"><span class="icon">S</span>建模三要素</div><p><strong>源点 s、汇点 t、容量 c(u,v)</strong>。每条边有容量上限。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">F</span>增广路</div><p>从 s 到 t 还能「多送」的路径；反复找增广路并累加流量，直到没有为止。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">M</span>最大流 = 最小割</div><p>割掉最少的边容量让 s、t 断开，这个值等于最大流——「最大流最小割定理」。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">C</span>应用</div><p>二分图匹配、任务分配、路径覆盖都可以建模成最大流。</p></div>
+</div>
+
+<div class="keyline">
+<p><strong>为什么网络流重要：</strong>它是很多「看起来完全不像流」的问题的统一模型。入门先记住概念和模板（Dinic），会用即可；理论细节放到以后深入。</p>
+</div>
+
+<div class="quiz" data-correct="A" data-quiz="quiz-flow">
+<div class="quiz-head"><strong>小测｜最大流算法</strong><span class="pill">网络流</span></div>
+<div class="quiz-body">
+<p>增广路算法求最大流的过程是：</p>
+<div class="options">
+<label class="option"><input name="quiz-flow" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">反复找一条还能增流的 s→t 路径并增加流量，直到没有增广路</span></span></label>
+<label class="option"><input name="quiz-flow" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">把所有边流量设成容量</span></span></label>
+<label class="option"><input name="quiz-flow" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">随机分配流量</span></span></label>
+<label class="option"><input name="quiz-flow" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">用二分查找</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="summary" id="summary">
+<div class="section-top">
+<div>
+<p class="section-kicker">11.4 · SUMMARY</p>
+<h2>总结与展望</h2>
+<p class="lead">图论到这章只是「入门三件套」，但已经覆盖大部分比赛中的基础图论题。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. 图论工具箱</h3>
+<div class="grid-2">
+<div class="card"><div class="mini-title"><span class="icon">①</span>连通性</div><p>并查集（第6章）、DFS/BFS 连通块。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">②</span>树</div><p>最小生成树、拓扑排序、树上问题。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">③</span>最短路</div><p>Dijkstra（非负权）、Floyd（全源）、Bellman-Ford（负权）。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">④</span>流</div><p>最大流、最小费用最大流（进阶）。</p></div>
+</div>
+
+<h3>2. 下一步怎么走</h3>
+<p>如果这些都能独立完成，恭喜——你已经具备参加区域赛「铜牌区」的基础。继续的方向：<strong>树链剖分与 LCA、二分图、费用流、连通性（Tarjan）</strong>，还有第12章的高级专题。记住：图论靠「画图 + 套模板 + 大量刷题」。</p>
+</section>
+
+<section class="lesson" data-section="practice" id="practice">
+<div class="section-top">
+<div>
+<p class="section-kicker">11.5 · TRAINING</p>
+<h2>本章训练：限时检验真实掌握</h2>
+<p class="lead">三题闭卷完成，先写答案再核对；错了就把原因写进「错因记录」。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<div class="practice-card">
+<div class="practice-meta"><span class="pill core">训练 1 · 填空计算</span><span class="pill">MST</span></div>
+<h3>写出运行结果</h3>
+<p>4 个点，边 (1,2)权1、(3,4)权2、(2,3)权3、(1,3)权4、(2,4)权5，最小生成树总权是多少？</p>
+<div class="answer-row">
+<input type="text" data-save="p1-answer" placeholder="输入数值"/>
+<button class="btn small primary" onclick="checkNumeric('p1-answer', 6, 'fb-p1', '正确！选权 1、2、3 三条边，总权 6。', '不对。按权从小到大选 1、2、3，总权 6。')">检查</button>
+</div>
+<div aria-live="polite" class="feedback" id="fb-p1"></div>
+<div class="practice-actions">
+<button class="btn small" data-reveal="p1-solution">查看答案</button>
+<button class="btn small" data-reveal="p1-hint">查看提示</button>
+</div>
+<div class="hint" id="p1-hint">按权排序：1、2、3、4、5，跳过会成环的。</div>
+<div class="solution" id="p1-solution">答案是 <span class="mono">6</span>。</div>
+</div>
+
+<div class="practice-card">
+<div class="practice-meta"><span class="pill core">训练 2 · 填空计算</span><span class="pill">Dijkstra</span></div>
+<h3>写出运行结果</h3>
+<p>图：1-2 权2、1-3 权4、2-4 权4、3-4 权3、3-5 权5、4-5 权1。从 1 到 5 的最短距离是多少？</p>
+<div class="answer-row">
+<input type="text" data-save="p2-answer" placeholder="输入数值"/>
+<button class="btn small primary" onclick="checkNumeric('p2-answer', 7, 'fb-p2', '正确！1→2→4→5 = 2+4+1 = 7。', '不对。最短是 1→2→4→5：2+4+1=7。')">检查</button>
+</div>
+<div aria-live="polite" class="feedback" id="fb-p2"></div>
+<div class="practice-actions">
+<button class="btn small" data-reveal="p2-solution">查看答案</button>
+<button class="btn small" data-reveal="p2-hint">查看提示</button>
+</div>
+<div class="hint" id="p2-hint">试几条路：1→3→5=9，1→2→4→5=7，1→3→4→5=8。</div>
+<div class="solution" id="p2-solution">答案是 <span class="mono">7</span>。</div>
+</div>
+
+<div class="practice-card">
+<div class="practice-meta"><span class="pill core">训练 3 · 填空计算</span><span class="pill">Floyd</span></div>
+<h3>写出运行结果</h3>
+<p>Floyd 是三层循环，当 n=10 时，最内层语句大约执行多少次？</p>
+<div class="answer-row">
+<input type="text" data-save="p3-answer" placeholder="输入数值"/>
+<button class="btn small primary" onclick="checkNumeric('p3-answer', 1000, 'fb-p3', '正确！10³ = 1000。', '不对。n³ = 10³ = 1000。')">检查</button>
+</div>
+<div aria-live="polite" class="feedback" id="fb-p3"></div>
+<div class="practice-actions">
+<button class="btn small" data-reveal="p3-solution">查看答案</button>
+<button class="btn small" data-reveal="p3-hint">查看提示</button>
+</div>
+<div class="hint" id="p3-hint">三层循环各 n 次：n×n×n。</div>
+<div class="solution" id="p3-solution">答案是 <span class="mono">1000</span>。</div>
+</div>
+
+<h3>刷题清单：把图论用到赛场上</h3>
+<p>这 8 道题专门练「MST、Dijkstra、Floyd」：</p>
+<div class="oj-grid">
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P3366" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P3366</span></div>
+<h4>【模板】最小生成树</h4>
+<p>Kruskal 模板题。</p>
+<p class="oj-why">为什么做：把本章 Kruskal 代码直接 AC，先模板后理解。</p>
+</a>
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P4779" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P4779</span></div>
+<h4>【模板】单源最短路径（标准版）</h4>
+<p>Dijkstra 堆优化模板。</p>
+<p class="oj-why">为什么做：比赛标配写法，练 priority_queue + pair。</p>
+</a>
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P1144" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P1144</span></div>
+<h4>最短路计数</h4>
+<p>统计最短路的条数。</p>
+<p class="oj-why">为什么做：BFS/最短路 + 计数，理解「最短路树」。</p>
+</a>
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P3371" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P3371</span></div>
+<h4>【模板】单源最短路径（弱化版）</h4>
+<p>朴素 Dijkstra 也能过的版本。</p>
+<p class="oj-why">为什么做：先用朴素版理解流程，再升级堆优化。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/20/C" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">20C</span></div>
+<h4>Dijkstra</h4>
+<p>输出 1 到 n 的一条最短路。</p>
+<p class="oj-why">为什么做：Dijkstra + 记录路径（pre 数组），进阶必做。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/601/A" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">601A</span></div>
+<h4>The Two Routes</h4>
+<p>火车与汽车两种交通方式。</p>
+<p class="oj-why">为什么做：BFS/最短路建模，理解「补图」。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/25/C" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">25C</span></div>
+<h4>Roads in Berland</h4>
+<p>动态加边后查询所有点对最短路和。</p>
+<p class="oj-why">为什么做：Floyd 的经典应用，学会「加边更新」。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/1095/F" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">1095F</span></div>
+<h4>Make It Connected</h4>
+<p>用特殊边或普通边连通所有点。</p>
+<p class="oj-why">为什么做：MST 建模，理解「如何构造边」。</p>
+</a>
+</div>
+
+<h3>错因记录</h3>
+<p>今天做错的题、踩过的坑，写在这里。</p>
+<textarea data-save="mistake-log" placeholder="例：Kruskal 忘了初始化并查集；Dijkstra 忘用 long long 存距离……"></textarea>
+</section>
+
+<section class="lesson" data-section="finish" id="finish">
+<div class="section-top">
+<div>
+<p class="section-kicker">FINISH · 通关</p>
+<h2>今日通关总结</h2>
+<p class="lead">先闭卷完成下面两项，再看掌握度。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>要点自检</h3>
+<div class="checklist">
+<label class="check-item"><input type="checkbox" data-save-check="c1"/><span>我会写并查集 find / union（路径压缩）。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c2"/><span>我会写 Kruskal 求最小生成树。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c3"/><span>我会写堆优化 Dijkstra（含 pre 记录路径）。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c4"/><span>我会写 Floyd，知道它 O(n³) 适合小 n 全源。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c5"/><span>我理解最大流与增广路、最大流最小割的概念。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c6"/><span>我已经在洛谷或 Codeforces 上 AC 了一道图论题。</span></label>
+</div>
+
+<h3>闭卷写出「方法口诀」</h3>
+<p>Kruskal 判断成环用 <strong><input type="text" data-save="finish-method" placeholder="三个字" style="display:inline-block;width:130px;min-height:38px;padding:6px 10px"/></strong>。</p>
+<button class="btn small primary" onclick="checkExact('finish-method', '并查集', 'fb-method', '正确！Kruskal + 并查集判环。', '答案是：并查集。')">检查</button>
+<div aria-live="polite" class="feedback" id="fb-method"></div>
+
+<h3>用一句话总结本章</h3>
+<textarea data-save="final-summary" placeholder="例：MST 和最短路模板到手，原来图论最重要的是建图……"></textarea>
+
+<div class="score-panel" style="margin-top:22px">
+<div class="card" style="display:grid;place-items:center;text-align:center">
+<div class="score-ring" id="scoreRing"><span id="scoreValue">0%</span></div>
+<p style="color:var(--muted);font-size:14px;margin:10px 0 0">本章掌握度 = 测验25% + 进度25% + 自检25% + 训练25%</p>
+</div>
+<div class="card">
+<h3 style="margin-top:0">当前水平</h3>
+<p id="levelText" style="font-size:18px;color:var(--ink-soft)">还没开始？完成上面的题目后这里会显示你的掌握度。</p>
+<div class="practice-actions">
+<button class="btn primary" id="exportBtn2" onclick="exportRecord()">导出学习记录</button>
+<button class="btn danger" onclick="resetAllProgress()">清空本页进度</button>
+</div>
+<p style="color:var(--muted);font-size:14px;margin-top:12px">提示：学习记录会保存成 txt 文件，方便你复盘。</p>
+</div>
+</div>
+</section>
+
+<footer>
+<p>本站内容为原创讲解与原创示例代码，知识体系参考《算法竞赛入门经典（第2版）》刘汝佳 著。</p>
+<p><a href="../../index.html">返回章节总览</a> · 上一章：<a href="../ch10/index.html">第10章 数学概念与方法</a> · 下一章：<a href="../ch12/index.html">第12章 高级专题</a></p>
+</footer>
+</div>
+</main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<script src="../../assets/js/ch11.js"></script>
+<script src="../../assets/js/lesson.js"></script>
+</body>
+</html>

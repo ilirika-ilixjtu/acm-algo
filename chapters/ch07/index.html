@@ -1,0 +1,594 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="description" content="算法竞赛入门 · 第7章《暴力求解法》交互式学习：简单枚举、枚举排列、子集生成、回溯法与八皇后。"/>
+<meta content="#F2EFE9" name="theme-color"/>
+<meta content="dark light" name="color-scheme"/>
+<title>第7章 暴力求解法 · 算法竞赛入门交互课</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg"/>
+<link rel="stylesheet" href="../../assets/css/lesson.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css"/>
+<script>
+window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] } };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<div class="page-grid">
+<aside aria-label="课程导航" class="sidebar">
+<a class="back-link" href="../../index.html">← 返回章节总览</a>
+<div class="brand">
+<div class="brand-mark">AC</div>
+<div><strong>算法入门 Lab</strong><small>第7章 · 暴力求解法</small></div>
+</div>
+<div class="timer-card">
+<div class="timer-label">本章总计时</div>
+<div class="timer-display" id="timerDisplay">00:00:00</div>
+<div class="timer-actions">
+<button class="btn primary" id="timerStart">开始</button>
+<button class="btn" id="timerPause">暂停</button>
+<button class="btn ghost" id="timerReset">重置计时</button>
+</div>
+</div>
+<div class="progress-wrap">
+<div class="progress-row"><span>课程进度</span><span id="progressText">0 / 8</span></div>
+<div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+</div>
+<div class="nav-title">学习路线</div>
+<nav class="nav-list" id="sideNav">
+<a class="nav-link" href="#plan"><span class="nav-dot"></span>0. 本章路线</a>
+<a class="nav-link" href="#diagnosis"><span class="nav-dot"></span>1. 预诊断</a>
+<a class="nav-link" href="#enumerate"><span class="nav-dot"></span>2. 简单枚举</a>
+<a class="nav-link" href="#perm"><span class="nav-dot"></span>3. 枚举排列</a>
+<a class="nav-link" href="#subset"><span class="nav-dot"></span>4. 子集生成</a>
+<a class="nav-link" href="#backtrack"><span class="nav-dot"></span>5. 回溯法</a>
+<a class="nav-link" href="#practice"><span class="nav-dot"></span>6. 本章训练</a>
+<a class="nav-link" href="#finish"><span class="nav-dot"></span>7. 通关总结</a>
+</nav>
+<div class="side-tools">
+<button class="btn small" id="themeToggle">切换夜雾</button>
+<button class="btn small" id="exportBtn">导出记录</button>
+</div>
+</aside>
+<main>
+<div class="mobile-bar">
+<button class="btn small primary" id="mobileStart">开始</button>
+<span class="mobile-timer" id="mobileTimer">00:00:00</span>
+<button class="btn small" id="mobilePause">暂停</button>
+<button class="btn small" id="mobileTheme">主题</button>
+</div>
+<div class="content">
+<header class="hero">
+<div class="hero-copy">
+<span class="eyebrow">CHAPTER 7 · 基础篇收官</span>
+<h1>暴力求解法</h1>
+<p>「暴力」不是贬义词。先把所有可能性<strong>完整枚举</strong>出来，再想办法<strong>剪枝</strong>——这是竞赛里最常用、也最考验基本功的思路。八皇后是这一章的明珠。</p>
+<div class="hero-tags">
+<span class="tag">枚举</span>
+<span class="tag">全排列</span>
+<span class="tag">子集生成</span>
+<span class="tag">回溯 + 剪枝</span>
+<span class="tag">八皇后棋盘</span>
+</div>
+<div class="hero-actions">
+<a class="btn primary" href="#plan">开始本章学习</a>
+<button class="btn" onclick="document.getElementById('enumerate').scrollIntoView()">直接进入核心知识</button>
+</div>
+</div>
+<div aria-label="全排列示例" class="hero-visual">
+<div class="code-block" style="box-shadow:none;border:1px solid var(--line)">
+<div class="code-head"><span class="code-title">程序 7-1 · 枚举 1~n 的全排列</span><span class="code-lang">C++</span></div>
+<div class="code-body"><pre><code class="language-cpp">int a[10], n;
+void dfs(int cur) {        /* cur: 已经填了几个位置 */
+  if (cur == n) { for (int i = 0; i &lt; n; i++) cout &lt;&lt; a[i] &lt;&lt; " "; cout &lt;&lt; endl; return; }
+  for (int i = 1; i &lt;= n; i++) {
+    int ok = 1;
+    for (int j = 0; j &lt; cur; j++) if (a[j] == i) ok = 0;  /* 已用过 */
+    if (ok) { a[cur] = i; dfs(cur + 1); }
+  }
+}</code></pre></div>
+</div>
+</div>
+</header>
+
+<section class="lesson" data-section="plan" id="plan">
+<div class="section-top">
+<div>
+<p class="section-kicker">PLAN · 路线</p>
+<h2>本章怎么学</h2>
+<p class="lead">学完本章，你能用循环枚举、next_permutation、二进制枚举子集，并会用「回溯 + 剪枝」解决八皇后这类搜索题。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>五个学习目标</h3>
+<div class="grid-3">
+<div class="card"><div class="mini-title"><span class="icon">1</span>简单枚举</div><p>用循环枚举所有候选，注意「剪枝」省时间。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">2</span>枚举排列</div><p>会手写全排列，也会用 <code>next_permutation</code>。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">3</span>子集生成</div><p>用二进制法枚举 $2^n$ 个子集。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">4</span>回溯法</div><p>「走不通就退回去」，八皇后是标准模板。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">5</span>剪枝</div><p>在枚举/搜索中提前排除不可能的分支。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">6</span>复杂度意识</div><p>知道 $n!$、$2^n$ 增长多快，什么时候暴力会超时。</p></div>
+</div>
+
+<h3>建议时间安排</h3>
+<div class="timeline">
+<div class="time-block"><b>0–10 分钟</b><strong>预诊断</strong><span>5 题摸清起点</span></div>
+<div class="time-block"><b>10–35 分钟</b><strong>简单枚举</strong><span>枚举 + 剪枝</span></div>
+<div class="time-block"><b>35–65 分钟</b><strong>枚举排列</strong><span>全排列 + next_permutation</span></div>
+<div class="time-block"><b>65–85 分钟</b><strong>子集生成</strong><span>二进制法</span></div>
+<div class="time-block"><b>85–120 分钟</b><strong>回溯法</strong><span>八皇后棋盘动手玩</span></div>
+<div class="time-block"><b>120–145 分钟</b><strong>训练 + 刷题</strong><span>3 道训练 + 错因记录</span></div>
+</div>
+
+<h3>学习主线</h3>
+<div class="method-flow">
+<div class="flow-node"><b>枚举</b>把所有可能列出来</div>
+<div class="flow-node"><b>排列/子集</b>标准生成方法</div>
+<div class="flow-node"><b>回溯</b>走不通就回头</div>
+<div class="flow-node"><b>剪枝</b>提前砍掉死路</div>
+</div>
+
+<div class="card warning">
+<div class="mini-title"><span class="icon">⚠</span>先记住一句话</div>
+<p>暴力前先算账：$n!$ 和 $2^n$ 涨得飞快（$10! = 3628800$ 勉强能跑，$20!$ 直接爆炸）。<strong>先估算枚举量再动手</strong>，超过 $10^8$ 就想剪枝或换思路。</p>
+</div>
+</section>
+
+<section class="lesson" data-section="diagnosis" id="diagnosis">
+<div class="section-top">
+<div>
+<p class="section-kicker">DIAGNOSIS · 摸底</p>
+<h2>预诊断：先看你卡在哪里</h2>
+<p class="lead">共 5 题。凭直觉答完再看反馈。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="pre1">
+<div class="quiz-head"><strong>Q1｜全排列个数</strong><span class="pill">排列</span></div>
+<div class="quiz-body">
+<p>4 个不同元素的排列一共有多少个？</p>
+<div class="options">
+<label class="option"><input name="pre1" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer"><span class="mono">12</span></span></span></label>
+<label class="option"><input name="pre1" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer"><span class="mono">24</span></span></span></label>
+<label class="option"><input name="pre1" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer"><span class="mono">16</span></span></span></label>
+<label class="option"><input name="pre1" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer"><span class="mono">8</span></span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="pre2">
+<div class="quiz-head"><strong>Q2｜下一个排列</strong><span class="pill">字典序</span></div>
+<div class="quiz-body">
+<p>按字典序，<code>1 2 3</code> 的下一个排列是：</p>
+<div class="options">
+<label class="option"><input name="pre2" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer"><span class="mono">2 1 3</span></span></span></label>
+<label class="option"><input name="pre2" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer"><span class="mono">1 3 2</span></span></span></label>
+<label class="option"><input name="pre2" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer"><span class="mono">3 2 1</span></span></span></label>
+<label class="option"><input name="pre2" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer"><span class="mono">1 2 3</span></span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="pre3">
+<div class="quiz-head"><strong>Q3｜子集个数</strong><span class="pill">子集</span></div>
+<div class="quiz-body">
+<p>3 个元素的集合一共有多少个子集（含空集）？</p>
+<div class="options">
+<label class="option"><input name="pre3" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer"><span class="mono">6</span></span></span></label>
+<label class="option"><input name="pre3" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer"><span class="mono">8</span></span></span></label>
+<label class="option"><input name="pre3" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer"><span class="mono">9</span></span></span></label>
+<label class="option"><input name="pre3" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer"><span class="mono">3</span></span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="pre4">
+<div class="quiz-head"><strong>Q4｜回溯的含义</strong><span class="pill">回溯</span></div>
+<div class="quiz-body">
+<p>「回溯」指的是：</p>
+<div class="options">
+<label class="option"><input name="pre4" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">把所有答案都存起来</span></span></label>
+<label class="option"><input name="pre4" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">走不通时撤销选择，回到上一步换一种可能</span></span></label>
+<label class="option"><input name="pre4" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">从后往前枚举</span></span></label>
+<label class="option"><input name="pre4" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">随机选一个答案</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="A" data-quiz="pre5">
+<div class="quiz-head"><strong>Q5｜暴力求解法的核心</strong><span class="pill">方法</span></div>
+<div class="quiz-body">
+<p>暴力求解法的基本套路是：</p>
+<div class="options">
+<label class="option"><input name="pre5" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">枚举所有候选 + 剪枝</span></span></label>
+<label class="option"><input name="pre5" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">只猜一个答案</span></span></label>
+<label class="option"><input name="pre5" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">用数学公式一步算出</span></span></label>
+<label class="option"><input name="pre5" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">依赖记忆化搜索</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="enumerate" id="enumerate">
+<div class="section-top">
+<div>
+<p class="section-kicker">7.1 · ENUMERATE</p>
+<h2>简单枚举：把可能的都试一遍</h2>
+<p class="lead">枚举就是「把所有候选都检查一遍」。关键是选对枚举对象，让候选数量可控。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>例题（原创重述）：abc 与它的重排</h3>
+<p>找出所有满足 <code>abc * 3 = bca</code> 的三位数（a 非 0）。最直接的办法：枚举 a、b、c（各 1~9 / 0~9），检查等式是否成立。候选只有 $9 \times 10 \times 10 = 900$ 个，瞬间跑完。</p>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 7-2 · 枚举三位数</span><span class="code-lang">C++</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-cpp">for (int a = 1; a &lt;= 9; a++)
+  for (int b = 0; b &lt;= 9; b++)
+    for (int c = 0; c &lt;= 9; c++) {
+      int abc = a * 100 + b * 10 + c;
+      int bca = b * 100 + c * 10 + a;
+      if (abc * 3 == bca) cout &lt;&lt; abc &lt;&lt; endl;
+    }</code></pre></div>
+</div>
+<p><strong>枚举的原则：</strong>① 别漏（候选覆盖所有可能）；② 别重（每个候选只算一次）；③ 能减就减（缩小枚举范围、提前判断，就是「剪枝」）。</p>
+
+<div class="keyline">
+<p><strong>换一个枚举对象往往更省：</strong>与其枚举 a、b、c 再验证，不如直接枚举 n 从 100 到 999，再拆位检查——有时候「枚举答案」比「枚举输入」快得多。</p>
+</div>
+</section>
+
+<section class="lesson" data-section="perm" id="perm">
+<div class="section-top">
+<div>
+<p class="section-kicker">7.2 · PERMUTATION</p>
+<h2>枚举排列：n 个元素排一排</h2>
+<p class="lead">全排列用递归生成；C++ 还提供 <code>next_permutation</code> 一键跳到下一个字典序排列。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. next_permutation</h3>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 7-3 · 输出所有排列</span><span class="code-lang">C++</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;algorithm&gt;
+using namespace std;
+
+int main() {
+  int a[] = {1, 2, 3};
+  do {
+    for (int i = 0; i &lt; 3; i++) cout &lt;&lt; a[i] &lt;&lt; " ";
+    cout &lt;&lt; endl;
+  } while (next_permutation(a, a + 3));   /* 生成全部 6 个排列 */
+  return 0;
+}</code></pre></div>
+</div>
+<p>注意：<code>next_permutation</code> 会改变数组，且要求数组初始是有序的（最小排列），这样才能遍历全部。</p>
+
+<h3>2. 可视化：1 2 3 的所有排列</h3>
+<div class="exec-stage" id="permStage">
+<div class="stage-title"><span class="icon">▶</span>next_permutation 逐步演示</div>
+<div id="permBox" style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap"></div>
+<div class="exec-log" id="permLog" style="margin-top:10px"></div>
+<div class="exec-controls">
+<button class="btn primary" id="permNext">下一个排列</button>
+</div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="quiz-perm">
+<div class="quiz-head"><strong>小测｜排列顺序</strong><span class="pill">字典序</span></div>
+<div class="quiz-body">
+<p>按字典序，1 2 3 的排列依次是 1 2 3、1 3 2、______、…… 第三个是：</p>
+<div class="options">
+<label class="option"><input name="quiz-perm" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer"><span class="mono">3 2 1</span></span></span></label>
+<label class="option"><input name="quiz-perm" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer"><span class="mono">2 1 3</span></span></span></label>
+<label class="option"><input name="quiz-perm" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer"><span class="mono">2 3 1</span></span></span></label>
+<label class="option"><input name="quiz-perm" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer"><span class="mono">3 1 2</span></span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="subset" id="subset">
+<div class="section-top">
+<div>
+<p class="section-kicker">7.3 · SUBSET</p>
+<h2>子集生成：二进制法</h2>
+<p class="lead">n 个元素的子集有 $2^n$ 个。用二进制数表示子集，是竞赛里最优雅的写法。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. 位表示子集</h3>
+<p>集合 {0, 1, 2} 的子集可以用 3 位二进制表示：第 i 位是 1 表示包含元素 i。比如 <code>101</code> 表示 {0, 2}。从 0 枚举到 $2^n-1$ 就枚举了所有子集。</p>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 7-4 · 二进制枚举子集</span><span class="code-lang">C++</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-cpp">int n = 3;
+for (int mask = 0; mask &lt; (1 &lt;&lt; n); mask++) {   /* 0..7 */
+  cout &lt;&lt; "{ ";
+  for (int i = 0; i &lt; n; i++)
+    if (mask &amp; (1 &lt;&lt; i)) cout &lt;&lt; i &lt;&lt; " ";   /* 第 i 位是 1 */
+  cout &lt;&lt; "}" &lt;&lt; endl;
+}</code></pre></div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="quiz-subset">
+<div class="quiz-head"><strong>小测｜子集数量</strong><span class="pill">2^n</span></div>
+<div class="quiz-body">
+<p>3 个元素的集合，二进制枚举会得到多少个子集？</p>
+<div class="options">
+<label class="option"><input name="quiz-subset" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer"><span class="mono">6</span></span></span></label>
+<label class="option"><input name="quiz-subset" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer"><span class="mono">8</span></span></span></label>
+<label class="option"><input name="quiz-subset" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer"><span class="mono">7</span></span></span></label>
+<label class="option"><input name="quiz-subset" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer"><span class="mono">9</span></span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="backtrack" id="backtrack">
+<div class="section-top">
+<div>
+<p class="section-kicker">7.4 · BACKTRACK</p>
+<h2>回溯法：八皇后</h2>
+<p class="lead">八皇后是回溯法的标准模板：一行一行放皇后，放不下就「撤销」换一列。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. 回溯模板</h3>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 7-5 · n 皇后</span><span class="code-lang">C++</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-cpp">int col[20], n, ans = 0;
+bool ok(int r, int c) {
+  for (int i = 0; i &lt; r; i++)
+    if (col[i] == c || abs(col[i] - c) == r - i) return false;  /* 同列或对角线 */
+  return true;
+}
+void dfs(int r) {
+  if (r == n) { ans++; return; }
+  for (int c = 0; c &lt; n; c++)
+    if (ok(r, c)) { col[r] = c; dfs(r + 1); col[r] = -1; }  /* 尝试 + 撤销 */
+}</code></pre></div>
+</div>
+<p>核心只有三行：<strong>尝试 → 递归 → 撤销（col[r] = -1）</strong>。「撤销」让同一层的其他选择互不影响，这就是回溯。</p>
+
+<h3>2. 动手玩：4 皇后</h3>
+<p>点击棋盘放置/移除皇后，红色框是会被攻击的位置。试试能不能放满 4 个且互不攻击：</p>
+<div class="exec-stage" id="queenStage">
+<div class="stage-title"><span class="icon">♛</span>4 皇后冲突检测</div>
+<div id="queenBoard" style="display:grid;grid-template-columns:repeat(4,64px);gap:6px;margin-top:4px"></div>
+<div class="exec-controls">
+<button class="btn small" id="queenReset">清空棋盘</button>
+</div>
+<div class="exec-log" id="queenLog" style="margin-top:10px"></div>
+</div>
+
+<div class="quiz" data-correct="A" data-quiz="quiz-queen">
+<div class="quiz-head"><strong>小测｜皇后冲突</strong><span class="pill">回溯</span></div>
+<div class="quiz-body">
+<p>第1行第1列放了皇后，那么第2行第1列：</p>
+<div class="options">
+<label class="option"><input name="quiz-queen" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">冲突（同一列），不能放</span></span></label>
+<label class="option"><input name="quiz-queen" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">可以放，没关系</span></span></label>
+<label class="option"><input name="quiz-queen" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">只有对角线才算冲突</span></span></label>
+<label class="option"><input name="quiz-queen" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">会覆盖掉原来的皇后</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="A" data-quiz="quiz-np">
+<div class="quiz-head"><strong>小测｜n 皇后的难度</strong><span class="pill">复杂度</span></div>
+<div class="quiz-body">
+<p>n 皇后问题没有已知的多项式算法，它属于：</p>
+<div class="options">
+<label class="option"><input name="quiz-np" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">NP 问题：只能枚举 + 剪枝</span></span></label>
+<label class="option"><input name="quiz-np" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">O(1) 问题：有公式直接算</span></span></label>
+<label class="option"><input name="quiz-np" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">贪心问题</span></span></label>
+<label class="option"><input name="quiz-np" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">动态规划问题</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="practice" id="practice">
+<div class="section-top">
+<div>
+<p class="section-kicker">7.5 · TRAINING</p>
+<h2>本章训练：限时检验真实掌握</h2>
+<p class="lead">三题闭卷完成，先写答案再核对；错了就把原因写进「错因记录」。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<div class="practice-card">
+<div class="practice-meta"><span class="pill core">训练 1 · 填空计算</span><span class="pill">排列</span></div>
+<h3>写出运行结果</h3>
+<p>4 个不同元素的全排列一共有多少个？</p>
+<div class="answer-row">
+<input type="text" data-save="p1-answer" placeholder="输入数值"/>
+<button class="btn small primary" onclick="checkNumeric('p1-answer', 24, 'fb-p1', '正确！4! = 4×3×2×1 = 24。', '不对。全排列个数是 n!，4! = 24。')">检查</button>
+</div>
+<div aria-live="polite" class="feedback" id="fb-p1"></div>
+<div class="practice-actions">
+<button class="btn small" data-reveal="p1-solution">查看答案</button>
+<button class="btn small" data-reveal="p1-hint">查看提示</button>
+</div>
+<div class="hint" id="p1-hint">4 个位置依次有 4、3、2、1 种选择。</div>
+<div class="solution" id="p1-solution">答案是 <span class="mono">24</span>。</div>
+</div>
+
+<div class="practice-card">
+<div class="practice-meta"><span class="pill core">训练 2 · 程序输出</span><span class="pill">next_permutation</span></div>
+<h3>写出运行结果</h3>
+<p>从 1 2 3 开始连续调用 next_permutation，第 4 个排列是什么？</p>
+<div class="answer-row">
+<input type="text" data-save="p2-answer" placeholder="例如：2 3 1"/>
+<button class="btn small primary" onclick="checkExact('p2-answer', '2 3 1', 'fb-p2', '正确！顺序是 123、132、213、231、312、321。', '还不对。顺序是 123 → 132 → 213 → 231 → ……')">检查</button>
+</div>
+<div aria-live="polite" class="feedback" id="fb-p2"></div>
+<div class="practice-actions">
+<button class="btn small" data-reveal="p2-solution">查看答案</button>
+<button class="btn small" data-reveal="p2-hint">查看提示</button>
+</div>
+<div class="hint" id="p2-hint">字典序：123、132、213、231、312、321。</div>
+<div class="solution" id="p2-solution">答案是 <span class="mono">2 3 1</span>。</div>
+</div>
+
+<div class="practice-card">
+<div class="practice-meta"><span class="pill core">训练 3 · 填空计算</span><span class="pill">子集</span></div>
+<h3>写出运行结果</h3>
+<p>4 个元素的集合，二进制法枚举能得到多少个子集？</p>
+<div class="answer-row">
+<input type="text" data-save="p3-answer" placeholder="输入数值"/>
+<button class="btn small primary" onclick="checkNumeric('p3-answer', 16, 'fb-p3', '正确！2^4 = 16。', '不对。子集数是 2^n，2^4 = 16。')">检查</button>
+</div>
+<div aria-live="polite" class="feedback" id="fb-p3"></div>
+<div class="practice-actions">
+<button class="btn small" data-reveal="p3-solution">查看答案</button>
+<button class="btn small" data-reveal="p3-hint">查看提示</button>
+</div>
+<div class="hint" id="p3-hint">每个元素「选或不选」两种可能。</div>
+<div class="solution" id="p3-solution">答案是 <span class="mono">16</span>。</div>
+</div>
+
+<h3>刷题清单：把暴力用到赛场上</h3>
+<p>这 8 道题专门练「枚举、排列、子集、回溯」：</p>
+<div class="oj-grid">
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P1706" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P1706</span></div>
+<h4>全排列问题</h4>
+<p>输出 1~n 的所有排列。</p>
+<p class="oj-why">为什么做：递归全排列 + next_permutation 双写法，模板题。</p>
+</a>
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P1157" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P1157</span></div>
+<h4>组合的输出</h4>
+<p>输出 n 选 r 的所有组合。</p>
+<p class="oj-why">为什么做：组合枚举，剪枝「后面的数必须更大」。</p>
+</a>
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P1219" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P1219</span></div>
+<h4>八皇后</h4>
+<p>经典回溯，输出方案与总数。</p>
+<p class="oj-why">为什么做：本章核心，把 4 皇后棋盘练到 8 皇后代码。</p>
+</a>
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P1088" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P1088</span></div>
+<h4>火星人</h4>
+<p>输出某个排列之后第 m 个排列。</p>
+<p class="oj-why">为什么做：next_permutation 直接调 m 次，体会标准库的威力。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/43/A" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">43A</span></div>
+<h4>Football</h4>
+<p>统计进球最多的球队名。</p>
+<p class="oj-why">为什么做：map 统计 + 枚举，简单但训练思路。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/266/B" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">266B</span></div>
+<h4>Queue at the School</h4>
+<p>模拟队伍每秒钟的换位。</p>
+<p class="oj-why">为什么做：一步一步模拟 = 最朴素的暴力。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/339/B" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">339B</span></div>
+<h4>Xenia and Ringroad</h4>
+<p>沿环走完所有任务的最短时间。</p>
+<p class="oj-why">为什么做：模拟 + 一点点推理，练「暴力但正确」。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/224/B" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">224B</span></div>
+<h4>Array</h4>
+<p>找包含 m 个不同数字的最短区间。</p>
+<p class="oj-why">为什么做：枚举 + 计数，双指针思想的雏形。</p>
+</a>
+</div>
+
+<h3>错因记录</h3>
+<p>今天做错的题、踩过的坑，写在这里。</p>
+<textarea data-save="mistake-log" placeholder="例：八皇后忘了撤销 col[r]=-1；next_permutation 前忘了先排序……"></textarea>
+</section>
+
+<section class="lesson" data-section="finish" id="finish">
+<div class="section-top">
+<div>
+<p class="section-kicker">FINISH · 通关</p>
+<h2>今日通关总结</h2>
+<p class="lead">先闭卷完成下面两项，再看掌握度。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>要点自检</h3>
+<div class="checklist">
+<label class="check-item"><input type="checkbox" data-save-check="c1"/><span>我会用循环枚举所有候选，并知道怎么剪枝。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c2"/><span>我会手写递归全排列，也会用 next_permutation。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c3"/><span>我会用二进制法枚举 $2^n$ 个子集。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c4"/><span>我能默写八皇后的回溯模板（尝试/递归/撤销）。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c5"/><span>我会在枚举前估算复杂度，判断会不会超时。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c6"/><span>我已经在洛谷或 Codeforces 上 AC 了一道搜索/枚举题。</span></label>
+</div>
+
+<h3>闭卷写出「方法口诀」</h3>
+<p>回溯三步：<strong>尝试、递归、<input type="text" data-save="finish-method" placeholder="两个字" style="display:inline-block;width:110px;min-height:38px;padding:6px 10px"/></strong>。</p>
+<button class="btn small primary" onclick="checkExact('finish-method', '撤销', 'fb-method', '正确！尝试、递归、撤销。', '答案是两个字：撤销。')">检查</button>
+<div aria-live="polite" class="feedback" id="fb-method"></div>
+
+<h3>用一句话总结本章</h3>
+<textarea data-save="final-summary" placeholder="例：原来「暴力」也有方法论：枚举 + 剪枝，回溯就是会后悔的枚举……"></textarea>
+
+<div class="score-panel" style="margin-top:22px">
+<div class="card" style="display:grid;place-items:center;text-align:center">
+<div class="score-ring" id="scoreRing"><span id="scoreValue">0%</span></div>
+<p style="color:var(--muted);font-size:14px;margin:10px 0 0">本章掌握度 = 测验25% + 进度25% + 自检25% + 训练25%</p>
+</div>
+<div class="card">
+<h3 style="margin-top:0">当前水平</h3>
+<p id="levelText" style="font-size:18px;color:var(--ink-soft)">还没开始？完成上面的题目后这里会显示你的掌握度。</p>
+<div class="practice-actions">
+<button class="btn primary" id="exportBtn2" onclick="exportRecord()">导出学习记录</button>
+<button class="btn danger" onclick="resetAllProgress()">清空本页进度</button>
+</div>
+<p style="color:var(--muted);font-size:14px;margin-top:12px">提示：学习记录会保存成 txt 文件，方便你复盘。</p>
+</div>
+</div>
+</section>
+
+<footer>
+<p>本站内容为原创讲解与原创示例代码，知识体系参考《算法竞赛入门经典（第2版）》刘汝佳 著。</p>
+<p><a href="../../index.html">返回章节总览</a> · 上一章：<a href="../ch06/index.html">第6章 数据结构基础</a> · 下一章：<a href="../ch08/index.html">第8章 高效算法设计</a></p>
+</footer>
+</div>
+</main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<script src="../../assets/js/ch07.js"></script>
+<script src="../../assets/js/lesson.js"></script>
+</body>
+</html>

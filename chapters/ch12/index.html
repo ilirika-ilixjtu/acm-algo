@@ -1,0 +1,595 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="description" content="算法竞赛入门 · 第12章《高级专题》交互式学习：自动机与 Trie、树的经典问题、可持久化数据结构、难题选解。"/>
+<meta content="#F2EFE9" name="theme-color"/>
+<meta content="dark light" name="color-scheme"/>
+<title>第12章 高级专题 · 算法竞赛入门交互课</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg"/>
+<link rel="stylesheet" href="../../assets/css/lesson.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css"/>
+<script>
+window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] } };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<div class="page-grid">
+<aside aria-label="课程导航" class="sidebar">
+<a class="back-link" href="../../index.html">← 返回章节总览</a>
+<div class="brand">
+<div class="brand-mark">AC</div>
+<div><strong>算法入门 Lab</strong><small>第12章 · 高级专题</small></div>
+</div>
+<div class="timer-card">
+<div class="timer-label">本章总计时</div>
+<div class="timer-display" id="timerDisplay">00:00:00</div>
+<div class="timer-actions">
+<button class="btn primary" id="timerStart">开始</button>
+<button class="btn" id="timerPause">暂停</button>
+<button class="btn ghost" id="timerReset">重置计时</button>
+</div>
+</div>
+<div class="progress-wrap">
+<div class="progress-row"><span>课程进度</span><span id="progressText">0 / 8</span></div>
+<div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+</div>
+<div class="nav-title">学习路线</div>
+<nav class="nav-list" id="sideNav">
+<a class="nav-link" href="#plan"><span class="nav-dot"></span>0. 本章路线</a>
+<a class="nav-link" href="#diagnosis"><span class="nav-dot"></span>1. 预诊断</a>
+<a class="nav-link" href="#auto"><span class="nav-dot"></span>2. 自动机与 Trie</a>
+<a class="nav-link" href="#tree"><span class="nav-dot"></span>3. 树的经典问题</a>
+<a class="nav-link" href="#persist"><span class="nav-dot"></span>4. 可持久化数据结构</a>
+<a class="nav-link" href="#hard"><span class="nav-dot"></span>5. 难题选解思路</a>
+<a class="nav-link" href="#practice"><span class="nav-dot"></span>6. 本章训练</a>
+<a class="nav-link" href="#finish"><span class="nav-dot"></span>7. 全书通关</a>
+</nav>
+<div class="side-tools">
+<button class="btn small" id="themeToggle">切换夜雾</button>
+<button class="btn small" id="exportBtn">导出记录</button>
+</div>
+</aside>
+<main>
+<div class="mobile-bar">
+<button class="btn small primary" id="mobileStart">开始</button>
+<span class="mobile-timer" id="mobileTimer">00:00:00</span>
+<button class="btn small" id="mobilePause">暂停</button>
+<button class="btn small" id="mobileTheme">主题</button>
+</div>
+<div class="content">
+<header class="hero">
+<div class="hero-copy">
+<span class="eyebrow">CHAPTER 12 · 终章</span>
+<h1>高级专题</h1>
+<p>最后一章是「路标」：<strong>自动机、树的经典问题、可持久化数据结构、难题选解</strong>。这些不是要你立刻精通，而是告诉你——每条路通向怎样的风景，以及该怎么走过去。</p>
+<div class="hero-tags">
+<span class="tag">Trie 与自动机</span>
+<span class="tag">LCA / 树形 DP</span>
+<span class="tag">主席树</span>
+<span class="tag">难题选解思路</span>
+<span class="tag">全书通关</span>
+</div>
+<div class="hero-actions">
+<a class="btn primary" href="#plan">开始本章学习</a>
+<button class="btn" onclick="document.getElementById('auto').scrollIntoView()">直接进入核心知识</button>
+</div>
+</div>
+<div aria-label="Trie 示例" class="hero-visual">
+<div class="code-block" style="box-shadow:none;border:1px solid var(--line)">
+<div class="code-head"><span class="code-title">程序 12-1 · Trie 插入</span><span class="code-lang">C++</span></div>
+<div class="code-body"><pre><code class="language-cpp">int ch[N][26], cnt[N], tot = 1;
+void insert(char *s) {
+  int u = 1, len = strlen(s);
+  for (int i = 0; i &lt; len; i++) {
+    int c = s[i] - 'a';
+    if (!ch[u][c]) ch[u][c] = ++tot;  /* 开新节点 */
+    u = ch[u][c];
+  }
+  cnt[u]++;   /* 这个单词的结尾 +1 */
+}</code></pre></div>
+</div>
+</div>
+</header>
+
+<section class="lesson" data-section="plan" id="plan">
+<div class="section-top">
+<div>
+<p class="section-kicker">PLAN · 路线</p>
+<h2>本章怎么学</h2>
+<p class="lead">本章定位是「路标 + 导览」：搞清每个专题解决什么问题、用什么工具，先会看题与套模板，再逐步深入。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>五个学习目标</h3>
+<div class="grid-3">
+<div class="card"><div class="mini-title"><span class="icon">1</span>Trie</div><p>字典树：字符串前缀的存储与查询。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">2</span>自动机</div><p>KMP / AC 自动机：模式串匹配。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">3</span>树的经典问题</div><p>LCA、树形 DP、树的重心与直径。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">4</span>可持久化</div><p>主席树：历史版本与区间第 k 小。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">5</span>难题选解</div><p>学会「读题 → 猜模型 → 小数据验证」。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">6</span>学习路线</div><p>知道自己接下来该往哪条路走。</p></div>
+</div>
+
+<h3>建议时间安排</h3>
+<div class="timeline">
+<div class="time-block"><b>0–10 分钟</b><strong>预诊断</strong><span>5 题摸清起点</span></div>
+<div class="time-block"><b>10–40 分钟</b><strong>自动机与 Trie</strong><span>Trie 插入可视化</span></div>
+<div class="time-block"><b>40–70 分钟</b><strong>树的经典问题</strong><span>LCA / 树形 DP</span></div>
+<div class="time-block"><b>70–95 分钟</b><strong>可持久化</strong><span>主席树概念</span></div>
+<div class="time-block"><b>95–120 分钟</b><strong>难题选解</strong><span>五类难题思路</span></div>
+<div class="time-block"><b>120–145 分钟</b><strong>训练 + 规划</strong><span>3 道训练 + 下一站规划</span></div>
+</div>
+
+<h3>学习主线</h3>
+<div class="method-flow">
+<div class="flow-node"><b>字符串</b>Trie → KMP → AC</div>
+<div class="flow-node"><b>树</b>LCA → 树形 DP</div>
+<div class="flow-node"><b>数据结构</b>可持久化线段树</div>
+<div class="flow-node"><b>实战</b>难题选解 + 刷题</div>
+</div>
+
+<div class="card warning">
+<div class="mini-title"><span class="icon">⚠</span>先记住一句话</div>
+<p>这本书看到这里，你已经拿到了「地图」。高级专题的特点是<strong>每个都深不见底</strong>：选 1–2 个感兴趣的深入（比如 LCA + 主席树），比每个都浅尝辄止更划算。</p>
+</div>
+</section>
+
+<section class="lesson" data-section="diagnosis" id="diagnosis">
+<div class="section-top">
+<div>
+<p class="section-kicker">DIAGNOSIS · 摸底</p>
+<h2>预诊断：先看你卡在哪里</h2>
+<p class="lead">共 5 题。凭直觉答完再看反馈。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<div class="quiz" data-correct="A" data-quiz="pre1">
+<div class="quiz-head"><strong>Q1｜Trie 是什么</strong><span class="pill">Trie</span></div>
+<div class="quiz-body">
+<p>Trie（字典树）最适合解决：</p>
+<div class="options">
+<label class="option"><input name="pre1" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">字符串前缀的存储与查询</span></span></label>
+<label class="option"><input name="pre1" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">整数排序</span></span></label>
+<label class="option"><input name="pre1" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">最短路</span></span></label>
+<label class="option"><input name="pre1" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">背包问题</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="A" data-quiz="pre2">
+<div class="quiz-head"><strong>Q2｜KMP 的核心</strong><span class="pill">KMP</span></div>
+<div class="quiz-body">
+<p>KMP 字符串匹配的核心数据结构是：</p>
+<div class="options">
+<label class="option"><input name="pre2" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">next 数组（前缀函数），失配时跳跃</span></span></label>
+<label class="option"><input name="pre2" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">一个栈</span></span></label>
+<label class="option"><input name="pre2" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">一个队列</span></span></label>
+<label class="option"><input name="pre2" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">哈希表</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="pre3">
+<div class="quiz-head"><strong>Q3｜LCA 是什么</strong><span class="pill">树</span></div>
+<div class="quiz-body">
+<p>树上两点的 LCA 指的是：</p>
+<div class="options">
+<label class="option"><input name="pre3" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">最长公共子串</span></span></label>
+<label class="option"><input name="pre3" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">最近公共祖先</span></span></label>
+<label class="option"><input name="pre3" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">最小生成树</span></span></label>
+<label class="option"><input name="pre3" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">层次遍历顺序</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="A" data-quiz="pre4">
+<div class="quiz-head"><strong>Q4｜可持久化</strong><span class="pill">可持久化</span></div>
+<div class="quiz-body">
+<p>「可持久化数据结构」的特点是：</p>
+<div class="options">
+<label class="option"><input name="pre4" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">保留所有历史版本，可查询过去的状态</span></span></label>
+<label class="option"><input name="pre4" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">数据永远不删</span></span></label>
+<label class="option"><input name="pre4" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">只能读不能写</span></span></label>
+<label class="option"><input name="pre4" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">只能存字符串</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="pre5">
+<div class="quiz-head"><strong>Q5｜非完美算法</strong><span class="pill">难题</span></div>
+<div class="quiz-body">
+<p>面对没有精确多项式解的大数据难题，常用：</p>
+<div class="options">
+<label class="option"><input name="pre5" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">只输出样例答案</span></span></label>
+<label class="option"><input name="pre5" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">随机化、爬山、模拟退火等启发式（非完美算法）</span></span></label>
+<label class="option"><input name="pre5" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">死等更快的电脑</span></span></label>
+<label class="option"><input name="pre5" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">拒绝做题</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="auto" id="auto">
+<div class="section-top">
+<div>
+<p class="section-kicker">12.1 · AUTOMATON</p>
+<h2>自动机与 Trie</h2>
+<p class="lead">字符串算法的高级形态都建立在 Trie 和自动机思想上：一个字符一个字符地「走状态」。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. Trie：字典树</h3>
+<p>Trie 把一组字符串按<strong>字符分层</strong>存成一棵树：根为空，每条边一个字符。插入「acm」「ac」「icpc」时，相同前缀共用节点。查询前缀、统计单词出现次数都很快。</p>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 12-2 · Trie 查询前缀</span><span class="code-lang">C++</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-cpp">int query(char *s) {        /* 返回 s 作为前缀出现了多少次 */
+  int u = 1, len = strlen(s);
+  for (int i = 0; i &lt; len; i++) {
+    int c = s[i] - 'a';
+    if (!ch[u][c]) return 0;
+    u = ch[u][c];
+  }
+  return sum[u];            /* sum 记录经过该节点的次数 */
+}</code></pre></div>
+</div>
+
+<h3>2. 可视化：Trie 逐步插入</h3>
+<div class="exec-stage" id="trieStage">
+<div class="stage-title"><span class="icon">▶</span>依次插入 acm、ac、icpc</div>
+<svg id="trieSvg" viewBox="0 0 420 260" style="min-height:200px;background:var(--surface-soft);border-radius:12px;border:1px solid var(--line)" role="img" aria-label="Trie 树"></svg>
+<div class="exec-log" id="trieLog" style="margin-top:8px"></div>
+<div class="exec-controls">
+<button class="btn primary" id="trieNext">下一步</button>
+</div>
+</div>
+
+<h3>3. 从 Trie 到自动机</h3>
+<div class="grid-2">
+<div class="card"><div class="mini-title"><span class="icon">K</span>KMP</div><p>单模式匹配：next 数组在失配时「跳」，主串指针不回退，$O(n+m)$。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">A</span>AC 自动机</div><p>多模式匹配：Trie + 失配指针（fail），一次扫描匹配所有模式串。</p></div>
+</div>
+
+<div class="quiz" data-correct="A" data-quiz="quiz-trie">
+<div class="quiz-head"><strong>小测｜Trie 共享前缀</strong><span class="pill">Trie</span></div>
+<div class="quiz-body">
+<p>插入 acm、ac 两个单词，它们共用的节点数是：</p>
+<div class="options">
+<label class="option"><input name="quiz-trie" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">2 个（a、c）</span></span></label>
+<label class="option"><input name="quiz-trie" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">3 个（a、c、m）</span></span></label>
+<label class="option"><input name="quiz-trie" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">0 个</span></span></label>
+<label class="option"><input name="quiz-trie" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">1 个</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="quiz-kmp">
+<div class="quiz-head"><strong>小测｜KMP</strong><span class="pill">KMP</span></div>
+<div class="quiz-body">
+<p>KMP 的 next 数组记录的是：</p>
+<div class="options">
+<label class="option"><input name="quiz-kmp" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">下一个字符的位置</span></span></label>
+<label class="option"><input name="quiz-kmp" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">失配时模式串应该跳到哪个位置</span></span></label>
+<label class="option"><input name="quiz-kmp" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">主串的长度</span></span></label>
+<label class="option"><input name="quiz-kmp" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">哈希值</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="tree" id="tree">
+<div class="section-top">
+<div>
+<p class="section-kicker">12.2 · TREE</p>
+<h2>树的经典问题</h2>
+<p class="lead">树是「没有环的图」。树上的问题套路清晰，是高级算法的最佳练习场。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. 四个经典问题</h3>
+<div class="grid-2">
+<div class="card"><div class="mini-title"><span class="icon">①</span>LCA</div><p>最近公共祖先：倍增 / Tarjan / 树链剖分，$O(\log n)$ 查询。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">②</span>树的直径</div><p>最长路径：两次 DFS/BFS 即可，$O(n)$。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">③</span>树的重心</div><p>删掉后剩余连通块尽量小；DP 一次求出。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">④</span>树形 DP</div><p>dp[u] 由子树的 dp 转移，如「没有上司的舞会」。</p></div>
+</div>
+
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 12-3 · 树的直径（两次 DFS）</span><span class="code-lang">C++</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-cpp">void dfs(int u, int fa) {
+  for (int v : g[u]) if (v != fa) { dep[v] = dep[u] + 1; dfs(v, u); }
+}
+dfs(1, 0);                /* 第一次：找最远的点 A */
+int A = max_element(dep + 1, dep + n + 1) - dep;
+dfs(A, 0);                /* 第二次：从 A 找最远点 B */
+int diameter = *max_element(dep + 1, dep + n + 1);</code></pre></div>
+</div>
+
+<div class="quiz" data-correct="A" data-quiz="quiz-lca">
+<div class="quiz-head"><strong>小测｜LCA</strong><span class="pill">树</span></div>
+<div class="quiz-body">
+<p>求树上有根后两点的 LCA，常用哪种方法？</p>
+<div class="options">
+<label class="option"><input name="quiz-lca" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">倍增（预先存好 2^k 级祖先）</span></span></label>
+<label class="option"><input name="quiz-lca" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">BFS 求最短路</span></span></label>
+<label class="option"><input name="quiz-lca" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">Kruskal</span></span></label>
+<label class="option"><input name="quiz-lca" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">Floyd</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="persist" id="persist">
+<div class="section-top">
+<div>
+<p class="section-kicker">12.3 · PERSISTENT</p>
+<h2>可持久化数据结构</h2>
+<p class="lead">「后悔药」版数据结构：每次修改都留一个版本，随时能回看历史。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. 可持久化线段树（主席树）</h3>
+<p>普通线段树修改会覆盖旧值；可持久化线段树每次修改<strong>新建一条路径</strong>上的节点，旧版本完整保留。用途：静态区间第 k 小、历史版本查询。</p>
+<div class="grid-2">
+<div class="card"><div class="mini-title"><span class="icon">①</span>为什么能保留</div><p>每次更新只动 $O(\log n)$ 个节点，新建这些节点即可，总空间 $O(n \log n)$。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">②</span>典型应用</div><p>主席树：在值域上建可持久化线段树，支持「区间 [l,r] 第 k 小」。</p></div>
+</div>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 12-4 · 可持久化线段树插入（概念骨架）</span><span class="code-lang">C++</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-cpp">int update(int pre, int l, int r, int pos) {
+  int now = ++tot;              /* 新节点 */
+  lc[now] = lc[pre]; rc[now] = rc[pre]; sum[now] = sum[pre] + 1;
+  if (l != r) {
+    int m = (l + r) / 2;
+    if (pos &lt;= m) lc[now] = update(lc[pre], l, m, pos);   /* 只新建一边 */
+    else          rc[now] = update(rc[pre], m + 1, r, pos);
+  }
+  return now;
+}</code></pre></div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="quiz-persist">
+<div class="quiz-head"><strong>小测｜主席树</strong><span class="pill">可持久化</span></div>
+<div class="quiz-body">
+<p>主席树是：</p>
+<div class="options">
+<label class="option"><input name="quiz-persist" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">一棵普通二叉搜索树</span></span></label>
+<label class="option"><input name="quiz-persist" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">可持久化线段树，支持历史版本与区间第 k 小</span></span></label>
+<label class="option"><input name="quiz-persist" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">哈希树</span></span></label>
+<label class="option"><input name="quiz-persist" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">堆</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="hard" id="hard">
+<div class="section-top">
+<div>
+<p class="section-kicker">12.4 · HARD</p>
+<h2>难题选解：五类思路</h2>
+<p class="lead">难题不是「想不出来」，而是「没往对的方向想」。记住每类的第一反应。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>五类难题的第一反应</h3>
+<div class="grid-2">
+<div class="card"><div class="mini-title"><span class="icon">①</span>数据结构题</div><p>看到「区间、第 k、出现次数」→ 想线段树、树状数组、主席树。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">②</span>网络流题</div><p>看到「分配、匹配、最大/最小」→ 尝试建模成最大流 / 费用流。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">③</span>数学题</div><p>看到「大数、取模、计数」→ 想数论、组合、矩阵快速幂。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">④</span>几何题</div><p>先写几何模板库：点、线、圆、凸包、半平面交。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">⑤</span>非完美算法</div><p>数据太大没精确解 → 随机化、爬山、模拟退火，尽量多拿分。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">⑥</span>杂题</div><p>先小数据打表找规律，再猜结论、验证结论。</p></div>
+</div>
+
+<div class="collapse-wrap">
+<button class="collapse-head" data-collapse="hard-tip"><span class="chev">▶</span>现场赛的做题策略<span style="margin-left:auto;color:var(--muted);font-weight:400;font-size:13px">点开看</span></button>
+<div class="collapse-body" id="hard-tip">
+<p>① 先扫一遍所有题，标记难度；② 从简单的开始 AC，保证基础分；③ 卡住 30 分钟就换题，别恋战；④ 赛后一定要补题（看题解 + 重写），进步全在补题里。</p>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="practice" id="practice">
+<div class="section-top">
+<div>
+<p class="section-kicker">12.5 · TRAINING</p>
+<h2>本章训练：检验你的「专题直觉」</h2>
+<p class="lead">三题闭卷完成，先写答案再核对；错了就把原因写进「错因记录」。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<div class="practice-card">
+<div class="practice-meta"><span class="pill core">训练 1 · 填空计算</span><span class="pill">Trie</span></div>
+<h3>写出运行结果</h3>
+<p>向空 Trie 依次插入 ab、abc、abd，一共会创建多少个节点（含根节点）？</p>
+<div class="answer-row">
+<input type="text" data-save="p1-answer" placeholder="输入数值"/>
+<button class="btn small primary" onclick="checkNumeric('p1-answer', 5, 'fb-p1', '正确！root + a + b + c + d = 5 个节点。', '不对。root、a、b 共享，再加 c、d，共 5 个。')">检查</button>
+</div>
+<div aria-live="polite" class="feedback" id="fb-p1"></div>
+<div class="practice-actions">
+<button class="btn small" data-reveal="p1-solution">查看答案</button>
+<button class="btn small" data-reveal="p1-hint">查看提示</button>
+</div>
+<div class="hint" id="p1-hint">ab、abc、abd 共用 a 和 b 两个节点。</div>
+<div class="solution" id="p1-solution">答案是 <span class="mono">5</span>（root、a、b、c、d）。</div>
+</div>
+
+<div class="practice-card">
+<div class="practice-meta"><span class="pill core">训练 2 · 填空计算</span><span class="pill">树的直径</span></div>
+<h3>写出运行结果</h3>
+<p>一条链 1—2—3—4（4 个点 3 条边），它的直径（最长路径经过的边数）是多少？</p>
+<div class="answer-row">
+<input type="text" data-save="p2-answer" placeholder="输入数值"/>
+<button class="btn small primary" onclick="checkNumeric('p2-answer', 3, 'fb-p2', '正确！从 1 到 4 要走 3 条边。', '不对。1 到 4 是最远点对，距离 3。')">检查</button>
+</div>
+<div aria-live="polite" class="feedback" id="fb-p2"></div>
+<div class="practice-actions">
+<button class="btn small" data-reveal="p2-solution">查看答案</button>
+<button class="btn small" data-reveal="p2-hint">查看提示</button>
+</div>
+<div class="hint" id="p2-hint">链的两个端点距离最远。</div>
+<div class="solution" id="p2-solution">答案是 <span class="mono">3</span>。</div>
+</div>
+
+<div class="practice-card">
+<div class="practice-meta"><span class="pill core">训练 3 · 填空计算</span><span class="pill">主席树</span></div>
+<h3>写出运行结果</h3>
+<p>可持久化线段树每次单点更新只新建 $O(\log n)$ 个节点。当 n = 2^20 时，每次更新新建约多少个节点？</p>
+<div class="answer-row">
+<input type="text" data-save="p3-answer" placeholder="输入数值"/>
+<button class="btn small primary" onclick="checkNumeric('p3-answer', 20, 'fb-p3', '正确！log2(2^20) = 20。', '不对。log₂(2²⁰) = 20。')">检查</button>
+</div>
+<div aria-live="polite" class="feedback" id="fb-p3"></div>
+<div class="practice-actions">
+<button class="btn small" data-reveal="p3-solution">查看答案</button>
+<button class="btn small" data-reveal="p3-hint">查看提示</button>
+</div>
+<div class="hint" id="p3-hint">log₂ n 等于 n 的二进制位数减一。</div>
+<div class="solution" id="p3-solution">答案是 <span class="mono">20</span>。</div>
+</div>
+
+<h3>刷题清单：把高级专题用到赛场上</h3>
+<p>这 8 道题带你入门「字符串、LCA、线段树、可持久化」：</p>
+<div class="oj-grid">
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P3375" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P3375</span></div>
+<h4>【模板】KMP</h4>
+<p>单模式字符串匹配。</p>
+<p class="oj-why">为什么做：KMP 模板，理解 next 数组的构造。</p>
+</a>
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P3808" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P3808</span></div>
+<h4>【模板】AC自动机（简单版）</h4>
+<p>多模式匹配。</p>
+<p class="oj-why">为什么做：AC 自动机模板，Trie + fail 指针。</p>
+</a>
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P3379" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P3379</span></div>
+<h4>【模板】最近公共祖先（LCA）</h4>
+<p>倍增求 LCA。</p>
+<p class="oj-why">为什么做：LCA 模板，树上算法的基本功。</p>
+</a>
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P3834" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P3834</span></div>
+<h4>【模板】可持久化线段树 2（主席树）</h4>
+<p>静态区间第 k 小。</p>
+<p class="oj-why">为什么做：主席树模板题，值得花一周吃透。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/208/E" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">208E</span></div>
+<h4>Blood Cousins</h4>
+<p>求第 k 级祖先与同层兄弟。</p>
+<p class="oj-why">为什么做：倍增 + DFS 序，LCA 的实战应用。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/1213/G" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">1213G</span></div>
+<h4>Path Queries</h4>
+<p>只经过权值 ≤ q 的边的路径数。</p>
+<p class="oj-why">为什么做：离线 + 并查集，经典的「边排序 + 加边」技巧。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/1234/D" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">1234D</span></div>
+<h4>Distinct Characters Queries</h4>
+<p>区间不同字符数量，支持修改。</p>
+<p class="oj-why">为什么做：26 棵线段树 / 树状数组，数据结构综合题。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/914/D" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">914D</span></div>
+<h4>Bash and a Tough Math Puzzle</h4>
+<p>区间 gcd 与单点修改。</p>
+<p class="oj-why">为什么做：线段树维护 gcd，经典思路。</p>
+</a>
+</div>
+
+<h3>错因记录</h3>
+<p>今天做错的题、踩过的坑，写在这里。</p>
+<textarea data-save="mistake-log" placeholder="例：KMP 的 next 数组下标搞混；主席树空间忘开 40 倍……"></textarea>
+</section>
+
+<section class="lesson" data-section="finish" id="finish">
+<div class="section-top">
+<div>
+<p class="section-kicker">FINISH · 全书通关</p>
+<h2>全书通关总结</h2>
+<p class="lead">恭喜走到最后！闭卷完成下面两项，看看这一路的收获。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>全书要点自检</h3>
+<div class="checklist">
+<label class="check-item"><input type="checkbox" data-save-check="c1"/><span>我会写 Trie 的插入与查询。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c2"/><span>我理解 KMP 的 next 数组与 AC 自动机的思路。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c3"/><span>我会用倍增求 LCA，会求树的直径与重心。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c4"/><span>我理解可持久化 / 主席树「保留历史版本」的思想。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c5"/><span>我知道五类难题的第一反应与现场赛策略。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c6"/><span>12 章全部学完，我已经知道接下来该往哪条路走。</span></label>
+</div>
+
+<h3>闭卷写出「方法口诀」</h3>
+<p>可持久化线段树又叫 <strong><input type="text" data-save="finish-method" placeholder="两个字" style="display:inline-block;width:110px;min-height:38px;padding:6px 10px"/></strong>树。</p>
+<button class="btn small primary" onclick="checkExact('finish-method', '主席', 'fb-method', '正确！主席树 = 可持久化线段树。', '答案是两个字：主席。')">检查</button>
+<div aria-live="polite" class="feedback" id="fb-method"></div>
+
+<h3>给学完 12 章的你</h3>
+<textarea data-save="final-summary" placeholder="例：从 printf 到主席树，这一路太值了。下一步：洛谷题单 + Codeforces Div2，向区域赛出发！"></textarea>
+
+<div class="score-panel" style="margin-top:22px">
+<div class="card" style="display:grid;place-items:center;text-align:center">
+<div class="score-ring" id="scoreRing"><span id="scoreValue">0%</span></div>
+<p style="color:var(--muted);font-size:14px;margin:10px 0 0">本章掌握度 = 测验25% + 进度25% + 自检25% + 训练25%</p>
+</div>
+<div class="card">
+<h3 style="margin-top:0">你的下一站</h3>
+<p style="font-size:17px;color:var(--ink-soft)">1. 洛谷「入门与进阶」题单刷 100 题；2. Codeforces Div2 每场打 A–C；3. 每周补题 + 写题解；4. 挑一个专题深入（LCA / 主席树 / 网络流）。</p>
+<div class="practice-actions">
+<button class="btn primary" id="exportBtn2" onclick="exportRecord()">导出全书通关记录</button>
+<button class="btn danger" onclick="resetAllProgress()">清空本页进度</button>
+</div>
+<p style="color:var(--muted);font-size:14px;margin-top:12px">恭喜通关！去赛场上检验这一路的积累吧。</p>
+</div>
+</div>
+</section>
+
+<footer>
+<p>本站内容为原创讲解与原创示例代码，知识体系参考《算法竞赛入门经典（第2版）》刘汝佳 著。</p>
+<p><a href="../../index.html">返回章节总览</a> · 上一章：<a href="../ch11/index.html">第11章 图论模型与算法</a> · 全书 12 章完结</p>
+</footer>
+</div>
+</main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<script src="../../assets/js/ch12.js"></script>
+<script src="../../assets/js/lesson.js"></script>
+</body>
+</html>

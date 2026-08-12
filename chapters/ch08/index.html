@@ -1,0 +1,606 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="description" content="算法竞赛入门 · 第8章《高效算法设计》交互式学习：复杂度分析、分治与归并排序、二分查找、贪心法。"/>
+<meta content="#F2EFE9" name="theme-color"/>
+<meta content="dark light" name="color-scheme"/>
+<title>第8章 高效算法设计 · 算法竞赛入门交互课</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg"/>
+<link rel="stylesheet" href="../../assets/css/lesson.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css"/>
+<script>
+window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] } };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<div class="page-grid">
+<aside aria-label="课程导航" class="sidebar">
+<a class="back-link" href="../../index.html">← 返回章节总览</a>
+<div class="brand">
+<div class="brand-mark">AC</div>
+<div><strong>算法入门 Lab</strong><small>第8章 · 高效算法设计</small></div>
+</div>
+<div class="timer-card">
+<div class="timer-label">本章总计时</div>
+<div class="timer-display" id="timerDisplay">00:00:00</div>
+<div class="timer-actions">
+<button class="btn primary" id="timerStart">开始</button>
+<button class="btn" id="timerPause">暂停</button>
+<button class="btn ghost" id="timerReset">重置计时</button>
+</div>
+</div>
+<div class="progress-wrap">
+<div class="progress-row"><span>课程进度</span><span id="progressText">0 / 8</span></div>
+<div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+</div>
+<div class="nav-title">学习路线</div>
+<nav class="nav-list" id="sideNav">
+<a class="nav-link" href="#plan"><span class="nav-dot"></span>0. 本章路线</a>
+<a class="nav-link" href="#diagnosis"><span class="nav-dot"></span>1. 预诊断</a>
+<a class="nav-link" href="#analysis"><span class="nav-dot"></span>2. 算法分析初步</a>
+<a class="nav-link" href="#divide"><span class="nav-dot"></span>3. 分治与归并</a>
+<a class="nav-link" href="#binary"><span class="nav-dot"></span>4. 二分查找</a>
+<a class="nav-link" href="#greedy"><span class="nav-dot"></span>5. 贪心法</a>
+<a class="nav-link" href="#practice"><span class="nav-dot"></span>6. 本章训练</a>
+<a class="nav-link" href="#finish"><span class="nav-dot"></span>7. 通关总结</a>
+</nav>
+<div class="side-tools">
+<button class="btn small" id="themeToggle">切换夜雾</button>
+<button class="btn small" id="exportBtn">导出记录</button>
+</div>
+</aside>
+<main>
+<div class="mobile-bar">
+<button class="btn small primary" id="mobileStart">开始</button>
+<span class="mobile-timer" id="mobileTimer">00:00:00</span>
+<button class="btn small" id="mobilePause">暂停</button>
+<button class="btn small" id="mobileTheme">主题</button>
+</div>
+<div class="content">
+<header class="hero">
+<div class="hero-copy">
+<span class="eyebrow">CHAPTER 8 · 竞赛篇开始</span>
+<h1>高效算法设计</h1>
+<p>竞赛篇的第一章。从这一章起，我们开始「<strong>用脑子换时间</strong>」：分治、二分、贪心——把 $O(n^2)$ 变成 $O(n \log n)$，把 $O(n)$ 变成 $O(\log n)$。</p>
+<div class="hero-tags">
+<span class="tag">复杂度分析</span>
+<span class="tag">分治与归并</span>
+<span class="tag">二分查找</span>
+<span class="tag">贪心法</span>
+<span class="tag">可视化逐步演示</span>
+</div>
+<div class="hero-actions">
+<a class="btn primary" href="#plan">开始本章学习</a>
+<button class="btn" onclick="document.getElementById('divide').scrollIntoView()">直接进入核心知识</button>
+</div>
+</div>
+<div aria-label="归并排序示例" class="hero-visual">
+<div class="code-block" style="box-shadow:none;border:1px solid var(--line)">
+<div class="code-head"><span class="code-title">程序 8-1 · 归并排序骨架</span><span class="code-lang">C++</span></div>
+<div class="code-body"><pre><code class="language-cpp">void merge_sort(int l, int r) {
+  if (l &gt;= r) return;
+  int m = (l + r) / 2;
+  merge_sort(l, m);      /* 分：排左半 */
+  merge_sort(m + 1, r);  /* 分：排右半 */
+  merge(l, m, r);        /* 治：合并两个有序段 */
+}</code></pre></div>
+</div>
+</div>
+</header>
+
+<section class="lesson" data-section="plan" id="plan">
+<div class="section-top">
+<div>
+<p class="section-kicker">PLAN · 路线</p>
+<h2>本章怎么学</h2>
+<p class="lead">学完本章，你能分析常见算法的复杂度，写出归并排序与二分查找，并理解贪心「每步取最优」的套路与适用条件。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>五个学习目标</h3>
+<div class="grid-3">
+<div class="card"><div class="mini-title"><span class="icon">1</span>复杂度分析</div><p>用大 O 描述算法，能判断会不会超时。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">2</span>分治法</div><p>「分解 → 解决 → 合并」的三步套路。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">3</span>归并排序</div><p>写出 $O(n \log n)$ 的排序，理解 merge 过程。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">4</span>二分查找</div><p>在有序数组里 $O(\log n)$ 查找，会用 lower_bound。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">5</span>贪心法</div><p>每步选当前最优，能举出适用与不适用的例子。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">6</span>排序与检索</div><p>知道排序是一切高效算法的基础。</p></div>
+</div>
+
+<h3>建议时间安排</h3>
+<div class="timeline">
+<div class="time-block"><b>0–10 分钟</b><strong>预诊断</strong><span>5 题摸清起点</span></div>
+<div class="time-block"><b>10–30 分钟</b><strong>算法分析</strong><span>大 O 与上界</span></div>
+<div class="time-block"><b>30–65 分钟</b><strong>分治与归并</strong><span>merge 可视化</span></div>
+<div class="time-block"><b>65–95 分钟</b><strong>二分查找</strong><span>区间收缩可视化</span></div>
+<div class="time-block"><b>95–120 分钟</b><strong>贪心法</strong><span>区间与背包</span></div>
+<div class="time-block"><b>120–145 分钟</b><strong>训练 + 刷题</strong><span>3 道训练 + 错因记录</span></div>
+</div>
+
+<h3>学习主线</h3>
+<div class="method-flow">
+<div class="flow-node"><b>分析</b>先算复杂度</div>
+<div class="flow-node"><b>分治</b>大问题拆小</div>
+<div class="flow-node"><b>二分</b>有序就砍半</div>
+<div class="flow-node"><b>贪心</b>每步取最优</div>
+</div>
+
+<div class="card warning">
+<div class="mini-title"><span class="icon">⚠</span>先记住一句话</div>
+<p>拿到题目先问三件事：<strong>① 数据范围多大？② 我现在的做法什么复杂度？③ 一秒内能跑完吗？</strong>很多「难题」其实只是需要把暴力换成高效算法。</p>
+</div>
+</section>
+
+<section class="lesson" data-section="diagnosis" id="diagnosis">
+<div class="section-top">
+<div>
+<p class="section-kicker">DIAGNOSIS · 摸底</p>
+<h2>预诊断：先看你卡在哪里</h2>
+<p class="lead">共 5 题。凭直觉答完再看反馈。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="pre1">
+<div class="quiz-head"><strong>Q1｜二分查找的复杂度</strong><span class="pill">复杂度</span></div>
+<div class="quiz-body">
+<p>在有序数组里二分查找一个数，时间复杂度是：</p>
+<div class="options">
+<label class="option"><input name="pre1" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">$O(n)$</span></span></label>
+<label class="option"><input name="pre1" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">$O(\log n)$</span></span></label>
+<label class="option"><input name="pre1" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">$O(n^2)$</span></span></label>
+<label class="option"><input name="pre1" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">$O(n \log n)$</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="A" data-quiz="pre2">
+<div class="quiz-head"><strong>Q2｜分治三步</strong><span class="pill">分治</span></div>
+<div class="quiz-body">
+<p>分治法的三个步骤是：</p>
+<div class="options">
+<label class="option"><input name="pre2" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">分解 → 解决 → 合并</span></span></label>
+<label class="option"><input name="pre2" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">排序 → 去重 → 输出</span></span></label>
+<label class="option"><input name="pre2" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">读入 → 计算 → 输出</span></span></label>
+<label class="option"><input name="pre2" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">枚举 → 判断 → 回溯</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="A" data-quiz="pre3">
+<div class="quiz-head"><strong>Q3｜合并两个有序数组</strong><span class="pill">归并</span></div>
+<div class="quiz-body">
+<p>把两个有序数组合并成一个有序数组，最直观的方法：</p>
+<div class="options">
+<label class="option"><input name="pre3" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">两个指针从头比较，取较小的放入结果</span></span></label>
+<label class="option"><input name="pre3" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">把两个数组拼接后排序</span></span></label>
+<label class="option"><input name="pre3" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">从后往前比较</span></span></label>
+<label class="option"><input name="pre3" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">随机挑</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="A" data-quiz="pre4">
+<div class="quiz-head"><strong>Q4｜二分的前提</strong><span class="pill">二分</span></div>
+<div class="quiz-body">
+<p>二分查找能工作的前提是：</p>
+<div class="options">
+<label class="option"><input name="pre4" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">数组有序</span></span></label>
+<label class="option"><input name="pre4" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">数组元素互不相同</span></span></label>
+<label class="option"><input name="pre4" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">数组是正数</span></span></label>
+<label class="option"><input name="pre4" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">数组长度是偶数</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="pre5">
+<div class="quiz-head"><strong>Q5｜区间贪心</strong><span class="pill">贪心</span></div>
+<div class="quiz-body">
+<p>「选尽量多的互不重叠区间」这类问题，常见的贪心策略是：</p>
+<div class="options">
+<label class="option"><input name="pre5" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">按开始时间排序</span></span></label>
+<label class="option"><input name="pre5" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">按结束时间排序，每次选结束最早的</span></span></label>
+<label class="option"><input name="pre5" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">按区间长度排序</span></span></label>
+<label class="option"><input name="pre5" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">随便选</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="analysis" id="analysis">
+<div class="section-top">
+<div>
+<p class="section-kicker">8.1 · ANALYSIS</p>
+<h2>算法分析初步：先算账再动手</h2>
+<p class="lead">大 O 表示法是竞赛的「通用语言」：一句话告诉别人你的算法多快。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. 常见复杂度从小到大</h3>
+<div class="grid-2">
+<div class="card"><div class="mini-title"><span class="icon">O</span>$O(1)$</div><p>常数时间：下标访问、直接算公式。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">O</span>$O(\log n)$</div><p>二分查找、平衡树操作，n=10⁹ 也飞快。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">O</span>$O(n)$</div><p>一次遍历，n=10⁶~10⁷ 没问题。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">O</span>$O(n \log n)$</div><p>排序、归并、堆，n=10⁶ 没问题。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">O</span>$O(n^2)$</div><p>双重循环，n=10⁴ 就到 10⁸，危险。</p></div>
+<div class="card danger"><div class="mini-title"><span class="icon">O</span>$O(2^n)$、$O(n!)$</div><p>指数级，n=20 就到极限，只用于小数据或剪枝。</p></div>
+</div>
+
+<div class="keyline">
+<p><strong>估算口诀：</strong>评测机一秒约 $10^8$ 次简单操作。把你的复杂度代入数据范围，算出约多少操作，超过 $10^8$ 就要优化。</p>
+</div>
+</section>
+
+<section class="lesson" data-section="divide" id="divide">
+<div class="section-top">
+<div>
+<p class="section-kicker">8.2 · DIVIDE</p>
+<h2>分治法与归并排序</h2>
+<p class="lead">分治 = 把大问题拆成几个小问题，分别解决，再合并答案。归并排序是它的招牌例子。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. 归并排序</h3>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 8-2 · 归并排序（完整）</span><span class="code-lang">C++</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+int a[100005], t[100005];
+
+void merge(int l, int m, int r) {   /* 合并两个有序段 */
+  int i = l, j = m + 1, k = l;
+  while (i &lt;= m &amp;&amp; j &lt;= r) t[k++] = (a[i] &lt;= a[j]) ? a[i++] : a[j++];
+  while (i &lt;= m) t[k++] = a[i++];
+  while (j &lt;= r) t[k++] = a[j++];
+  for (i = l; i &lt;= r; i++) a[i] = t[i];
+}
+void msort(int l, int r) {
+  if (l &gt;= r) return;
+  int m = (l + r) / 2;
+  msort(l, m); msort(m + 1, r);
+  merge(l, m, r);
+}</code></pre></div>
+</div>
+<p>复杂度：每层合并总共 $O(n)$，一共 $\log n$ 层，合计 $O(n \log n)$——比冒泡/选择的 $O(n^2)$ 快得多。</p>
+
+<h3>2. 可视化：合并两个有序数组</h3>
+<div class="exec-stage" id="mergeStage">
+<div class="stage-title"><span class="icon">▶</span>merge 的双指针过程</div>
+<div class="grid-2">
+<div><p style="color:var(--muted);font-size:13px;margin:0 0 8px">A =</p><div id="mergeA" style="display:flex;gap:6px"><span class="srt">1</span><span class="srt">4</span><span class="srt">7</span></div></div>
+<div><p style="color:var(--muted);font-size:13px;margin:0 0 8px">B =</p><div id="mergeB" style="display:flex;gap:6px"><span class="srt">2</span><span class="srt">3</span><span class="srt">6</span></div></div>
+</div>
+<p style="color:var(--muted);font-size:13px;margin:12px 0 6px">结果 =</p>
+<div id="mergeOut" class="exec-log" style="margin-top:0;min-height:40px">（空）</div>
+<div class="exec-controls">
+<button class="btn primary" id="mergeNext">取下一个</button>
+</div>
+</div>
+<style>.srt{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:8px 14px;font-weight:800;font-family:ui-monospace,Consolas,monospace}.srt.pick{background:var(--sage);color:#fff}</style>
+
+<div class="quiz" data-correct="A" data-quiz="quiz-merge">
+<div class="quiz-head"><strong>小测｜合并结果</strong><span class="pill">归并</span></div>
+<div class="quiz-body">
+<p>合并 A=[1,4,7] 与 B=[2,3,6]，结果是：</p>
+<div class="options">
+<label class="option"><input name="quiz-merge" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer"><span class="mono">1 2 3 4 6 7</span></span></span></label>
+<label class="option"><input name="quiz-merge" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer"><span class="mono">1 4 7 2 3 6</span></span></span></label>
+<label class="option"><input name="quiz-merge" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer"><span class="mono">2 3 6 1 4 7</span></span></span></label>
+<label class="option"><input name="quiz-merge" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer"><span class="mono">1 2 4 3 6 7</span></span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="binary" id="binary">
+<div class="section-top">
+<div>
+<p class="section-kicker">8.3 · BINARY SEARCH</p>
+<h2>二分查找：有序就砍半</h2>
+<p class="lead">有序数组里找一个数，不用一个个看——每次砍掉一半，10 亿个数据 30 次搞定。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. 手写二分</h3>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 8-3 · 在有序数组中找 x</span><span class="code-lang">C++</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-cpp">int l = 0, r = n - 1, ans = -1;
+while (l &lt;= r) {
+  int mid = (l + r) / 2;
+  if (a[mid] == x) { ans = mid; break; }
+  if (a[mid] &lt; x) l = mid + 1;   /* 目标在右半 */
+  else            r = mid - 1;   /* 目标在左半 */
+}</code></pre></div>
+</div>
+
+<h3>2. 可视化：在 1 3 5 7 9 里找 7</h3>
+<div class="exec-stage" id="binStage">
+<div class="stage-title"><span class="icon">▶</span>二分查找过程</div>
+<div id="binArr" style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap"><span class="bint">1</span><span class="bint">3</span><span class="bint">5</span><span class="bint">7</span><span class="bint">9</span></div>
+<div class="legend">
+<span class="lg"><span class="sw" style="background:var(--rose)"></span>左边界 l</span>
+<span class="lg"><span class="sw" style="background:var(--blue)"></span>右边界 r</span>
+<span class="lg"><span class="sw" style="background:var(--sage)"></span>mid</span>
+</div>
+<div class="exec-log" id="binLog" style="margin-top:8px">目标 7。初始区间 [0, 4]。</div>
+<div class="exec-controls">
+<button class="btn primary" id="binNext">下一步</button>
+</div>
+</div>
+<style>.bint{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:8px 14px;font-weight:800;font-family:ui-monospace,Consolas,monospace}.bint.lo{background:var(--rose);color:#fff}.bint.hi{background:var(--blue);color:#fff}.bint.mid{background:var(--sage);color:#fff}.bint.found{background:var(--sage-deep);color:#fff}</style>
+
+<h3>3. lower_bound 全家桶</h3>
+<p>STL 提供了现成二分：<code>lower_bound(a,a+n,x)</code> 返回<strong>第一个 ≥ x</strong> 的地址，<code>upper_bound</code> 返回<strong>第一个 > x</strong> 的地址。差值就是「有多少个等于 x」。</p>
+
+<div class="quiz" data-correct="B" data-quiz="quiz-binary">
+<div class="quiz-head"><strong>小测｜二分找 7</strong><span class="pill">二分</span></div>
+<div class="quiz-body">
+<p>在 [1,3,5,7,9] 中二分找 7，第一次比较的 mid 是哪个元素？</p>
+<div class="options">
+<label class="option"><input name="quiz-binary" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer"><span class="mono">1</span></span></span></label>
+<label class="option"><input name="quiz-binary" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer"><span class="mono">5</span></span></span></label>
+<label class="option"><input name="quiz-binary" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer"><span class="mono">7</span></span></span></label>
+<label class="option"><input name="quiz-binary" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer"><span class="mono">9</span></span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="A" data-quiz="quiz-lowerbound">
+<div class="quiz-head"><strong>小测｜lower_bound</strong><span class="pill">STL 二分</span></div>
+<div class="quiz-body">
+<p>在 [1,3,5,7] 中，lower_bound 找 6 返回的位置是：</p>
+<div class="options">
+<label class="option"><input name="quiz-lowerbound" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">指向 7（第一个 ≥ 6 的元素）</span></span></label>
+<label class="option"><input name="quiz-lowerbound" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">指向 5</span></span></label>
+<label class="option"><input name="quiz-lowerbound" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">指向 3</span></span></label>
+<label class="option"><input name="quiz-lowerbound" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">找不到，返回空</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="greedy" id="greedy">
+<div class="section-top">
+<div>
+<p class="section-kicker">8.4 · GREEDY</p>
+<h2>贪心法：每步取当前最优</h2>
+<p class="lead">贪心不回头：每一步都选「看起来最好」的，希望最终全局最优。关键是证明「这样选不会后悔」。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. 三个经典例子</h3>
+<div class="grid-2">
+<div class="card"><div class="mini-title"><span class="icon">①</span>区间调度</div><p>选最多的互不重叠区间：按<strong>结束时间</strong>排序，每次选结束最早的。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">②</span>部分背包</div><p>物品可切分：按<strong>单位重量价值</strong>从大到小拿。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">③</span>Huffman 编码</div><p>每次合并频率最小的两个节点，得到最优前缀码。</p></div>
+<div class="card danger"><div class="mini-title"><span class="icon">!</span>贪心的边界</div><p>0-1 背包（物品不可切分）<strong>不能</strong>用简单贪心——那是第9章动态规划的事。</p></div>
+</div>
+
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 8-4 · 区间调度骨架</span><span class="code-lang">C++</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-cpp">struct Seg { int l, r; };
+bool cmp(Seg a, Seg b) { return a.r &lt; b.r; }   /* 按结束时间排序 */
+sort(seg, seg + n, cmp);
+int cnt = 0, last = -1e9;
+for (int i = 0; i &lt; n; i++)
+  if (seg[i].l &gt;= last) { cnt++; last = seg[i].r; }   /* 不重叠就选 */</code></pre></div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="quiz-greedy">
+<div class="quiz-head"><strong>小测｜部分背包</strong><span class="pill">贪心</span></div>
+<div class="quiz-body">
+<p>部分背包（物品可切分）的正确贪心是按什么排序？</p>
+<div class="options">
+<label class="option"><input name="quiz-greedy" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">按总价值排序</span></span></label>
+<label class="option"><input name="quiz-greedy" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">按单位重量价值排序</span></span></label>
+<label class="option"><input name="quiz-greedy" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">按重量排序</span></span></label>
+<label class="option"><input name="quiz-greedy" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">按名字排序</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="practice" id="practice">
+<div class="section-top">
+<div>
+<p class="section-kicker">8.5 · TRAINING</p>
+<h2>本章训练：限时检验真实掌握</h2>
+<p class="lead">三题闭卷完成，先写答案再核对；错了就把原因写进「错因记录」。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<div class="practice-card">
+<div class="practice-meta"><span class="pill core">训练 1 · 填空计算</span><span class="pill">二分</span></div>
+<h3>写出运行结果</h3>
+<p>在 [1,3,5,7,9] 中二分查找 7，找到时它的下标是多少？（下标从 0 开始）</p>
+<div class="answer-row">
+<input type="text" data-save="p1-answer" placeholder="输入数值"/>
+<button class="btn small primary" onclick="checkNumeric('p1-answer', 3, 'fb-p1', '正确！7 在数组的第 4 个位置，下标 3。', '不对。数组 1 3 5 7 9 中 7 的下标是 3。')">检查</button>
+</div>
+<div aria-live="polite" class="feedback" id="fb-p1"></div>
+<div class="practice-actions">
+<button class="btn small" data-reveal="p1-solution">查看答案</button>
+<button class="btn small" data-reveal="p1-hint">查看提示</button>
+</div>
+<div class="hint" id="p1-hint">下标从 0 数：1 是 0，3 是 1，5 是 2，7 是 3。</div>
+<div class="solution" id="p1-solution">答案是 <span class="mono">3</span>。</div>
+</div>
+
+<div class="practice-card">
+<div class="practice-meta"><span class="pill core">训练 2 · 程序输出</span><span class="pill">归并</span></div>
+<h3>写出运行结果</h3>
+<p>把 [1,4,7] 与 [2,3,6] 合并成有序数组，结果是什么？</p>
+<div class="answer-row">
+<input type="text" data-save="p2-answer" placeholder="例如：1 2 3 4 6 7"/>
+<button class="btn small primary" onclick="checkExact('p2-answer', '1 2 3 4 6 7', 'fb-p2', '正确！双指针合并得到 1 2 3 4 6 7。', '还不对。逐对取小：1 2 3 4 6 7。')">检查</button>
+</div>
+<div aria-live="polite" class="feedback" id="fb-p2"></div>
+<div class="practice-actions">
+<button class="btn small" data-reveal="p2-solution">查看答案</button>
+<button class="btn small" data-reveal="p2-hint">查看提示</button>
+</div>
+<div class="hint" id="p2-hint">两个指针分别从 1 和 2 开始，每次取较小的。</div>
+<div class="solution" id="p2-solution">答案是 <span class="mono">1 2 3 4 6 7</span>。</div>
+</div>
+
+<div class="practice-card">
+<div class="practice-meta"><span class="pill core">训练 3 · 填空计算</span><span class="pill">区间贪心</span></div>
+<h3>写出运行结果</h3>
+<p>区间 [1,3]、[2,4]、[3,5]、[4,6]（闭区间），按「结束最早」贪心，最多能选几个互不重叠的区间？</p>
+<div class="answer-row">
+<input type="text" data-save="p3-answer" placeholder="输入数值"/>
+<button class="btn small primary" onclick="checkNumeric('p3-answer', 2, 'fb-p3', '正确！先选 [1,3]，下一个能接的是 [3,5]，共 2 个。', '不对。按结束排序选 [1,3] 和 [3,5]，共 2 个。')">检查</button>
+</div>
+<div aria-live="polite" class="feedback" id="fb-p3"></div>
+<div class="practice-actions">
+<button class="btn small" data-reveal="p3-solution">查看答案</button>
+<button class="btn small" data-reveal="p3-hint">查看提示</button>
+</div>
+<div class="hint" id="p3-hint">选 [1,3] 后，下一个区间起点必须 ≥ 3。</div>
+<div class="solution" id="p3-solution">答案是 <span class="mono">2</span>（[1,3] 与 [3,5]）。</div>
+</div>
+
+<h3>刷题清单：把高效算法用到赛场上</h3>
+<p>这 8 道题专门练「排序、二分、分治、贪心」：</p>
+<div class="oj-grid">
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P1177" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P1177</span></div>
+<h4>【模板】排序</h4>
+<p>给 n 个数排序。</p>
+<p class="oj-why">为什么做：手写归并 + sort 双写法，模板题。</p>
+</a>
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P1923" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P1923</span></div>
+<h4>求第 k 小的数</h4>
+<p>排序后找第 k 小。</p>
+<p class="oj-why">为什么做：排序 + 下标访问，或学 nth_element。</p>
+</a>
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P1024" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P1024</span></div>
+<h4>一元三次方程求解</h4>
+<p>在区间上二分找实根。</p>
+<p class="oj-why">为什么做：实数二分的经典题，学「精度控制」。</p>
+</a>
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P1803" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P1803</span></div>
+<h4>凌乱的yyy / 线段覆盖</h4>
+<p>选最多的互不重叠区间。</p>
+<p class="oj-why">为什么做：区间贪心模板题，和本章例子几乎一样。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/492/B" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">492B</span></div>
+<h4>Vanya and Lanterns</h4>
+<p>路灯照亮整条街的最小半径。</p>
+<p class="oj-why">为什么做：排序 + 找最大间隔，二分也可以做。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/1352/C" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">1352C</span></div>
+<h4>K-th Not Divisible by n</h4>
+<p>找第 k 个不能被 n 整除的数。</p>
+<p class="oj-why">为什么做：二分答案的入门题，学会「对答案二分」。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/1203/C" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">1203C</span></div>
+<h4>Common Divisors</h4>
+<p>求一组数的公约数个数。</p>
+<p class="oj-why">为什么做：先 gcd 再枚举因子，练「枚举 + 数论」。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/1472/D" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">1472D</span></div>
+<h4>Even-Odd Game</h4>
+<p>两人轮流取数，最大化自己得分。</p>
+<p class="oj-why">为什么做：排序 + 贪心模拟的经典博弈入门。</p>
+</a>
+</div>
+
+<h3>错因记录</h3>
+<p>今天做错的题、踩过的坑，写在这里。</p>
+<textarea data-save="mistake-log" placeholder="例：二分 while(l<=r) 写成 l<r 漏掉边界；merge 忘了回填临时数组……"></textarea>
+</section>
+
+<section class="lesson" data-section="finish" id="finish">
+<div class="section-top">
+<div>
+<p class="section-kicker">FINISH · 通关</p>
+<h2>今日通关总结</h2>
+<p class="lead">先闭卷完成下面两项，再看掌握度。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>要点自检</h3>
+<div class="checklist">
+<label class="check-item"><input type="checkbox" data-save-check="c1"/><span>我会用大 O 分析复杂度，判断算法会不会超时。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c2"/><span>我会写归并排序（分解、解决、合并）。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c3"/><span>我会手写二分查找，也会用 lower_bound / upper_bound。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c4"/><span>我会区间调度贪心（按结束时间排序）。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c5"/><span>我知道部分背包能贪心、0-1 背包不能。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c6"/><span>我已经在洛谷或 Codeforces 上 AC 了一道分治/二分/贪心题。</span></label>
+</div>
+
+<h3>闭卷写出「方法口诀」</h3>
+<p>二分查找的前提是数组 <strong><input type="text" data-save="finish-method" placeholder="两个字" style="display:inline-block;width:110px;min-height:38px;padding:6px 10px"/></strong>。</p>
+<button class="btn small primary" onclick="checkExact('finish-method', '有序', 'fb-method', '正确！二分的前提是有序。', '答案是两个字：有序。')">检查</button>
+<div aria-live="polite" class="feedback" id="fb-method"></div>
+
+<h3>用一句话总结本章</h3>
+<textarea data-save="final-summary" placeholder="例：分治、二分、贪心三个套路都上手了，从 O(n²) 到 O(n log n) 原来并不难……"></textarea>
+
+<div class="score-panel" style="margin-top:22px">
+<div class="card" style="display:grid;place-items:center;text-align:center">
+<div class="score-ring" id="scoreRing"><span id="scoreValue">0%</span></div>
+<p style="color:var(--muted);font-size:14px;margin:10px 0 0">本章掌握度 = 测验25% + 进度25% + 自检25% + 训练25%</p>
+</div>
+<div class="card">
+<h3 style="margin-top:0">当前水平</h3>
+<p id="levelText" style="font-size:18px;color:var(--ink-soft)">还没开始？完成上面的题目后这里会显示你的掌握度。</p>
+<div class="practice-actions">
+<button class="btn primary" id="exportBtn2" onclick="exportRecord()">导出学习记录</button>
+<button class="btn danger" onclick="resetAllProgress()">清空本页进度</button>
+</div>
+<p style="color:var(--muted);font-size:14px;margin-top:12px">提示：学习记录会保存成 txt 文件，方便你复盘。</p>
+</div>
+</div>
+</section>
+
+<footer>
+<p>本站内容为原创讲解与原创示例代码，知识体系参考《算法竞赛入门经典（第2版）》刘汝佳 著。</p>
+<p><a href="../../index.html">返回章节总览</a> · 上一章：<a href="../ch07/index.html">第7章 暴力求解法</a> · 下一章：<a href="../ch09/index.html">第9章 动态规划初步</a></p>
+</footer>
+</div>
+</main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<script src="../../assets/js/ch08.js"></script>
+<script src="../../assets/js/lesson.js"></script>
+</body>
+</html>

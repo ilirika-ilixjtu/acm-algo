@@ -1,0 +1,614 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="description" content="算法竞赛入门 · 第10章《数学概念与方法》交互式学习：gcd、埃氏筛、快速幂、同余、杨辉三角与组合数、概率期望。"/>
+<meta content="#F2EFE9" name="theme-color"/>
+<meta content="dark light" name="color-scheme"/>
+<title>第10章 数学概念与方法 · 算法竞赛入门交互课</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg"/>
+<link rel="stylesheet" href="../../assets/css/lesson.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css"/>
+<script>
+window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] } };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<div class="page-grid">
+<aside aria-label="课程导航" class="sidebar">
+<a class="back-link" href="../../index.html">← 返回章节总览</a>
+<div class="brand">
+<div class="brand-mark">AC</div>
+<div><strong>算法入门 Lab</strong><small>第10章 · 数学概念与方法</small></div>
+</div>
+<div class="timer-card">
+<div class="timer-label">本章总计时</div>
+<div class="timer-display" id="timerDisplay">00:00:00</div>
+<div class="timer-actions">
+<button class="btn primary" id="timerStart">开始</button>
+<button class="btn" id="timerPause">暂停</button>
+<button class="btn ghost" id="timerReset">重置计时</button>
+</div>
+</div>
+<div class="progress-wrap">
+<div class="progress-row"><span>课程进度</span><span id="progressText">0 / 8</span></div>
+<div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+</div>
+<div class="nav-title">学习路线</div>
+<nav class="nav-list" id="sideNav">
+<a class="nav-link" href="#plan"><span class="nav-dot"></span>0. 本章路线</a>
+<a class="nav-link" href="#diagnosis"><span class="nav-dot"></span>1. 预诊断</a>
+<a class="nav-link" href="#number"><span class="nav-dot"></span>2. 数论初步</a>
+<a class="nav-link" href="#powmod"><span class="nav-dot"></span>3. 快速幂与取模</a>
+<a class="nav-link" href="#count"><span class="nav-dot"></span>4. 计数与概率</a>
+<a class="nav-link" href="#expect"><span class="nav-dot"></span>5. 递推与期望</a>
+<a class="nav-link" href="#practice"><span class="nav-dot"></span>6. 本章训练</a>
+<a class="nav-link" href="#finish"><span class="nav-dot"></span>7. 通关总结</a>
+</nav>
+<div class="side-tools">
+<button class="btn small" id="themeToggle">切换夜雾</button>
+<button class="btn small" id="exportBtn">导出记录</button>
+</div>
+</aside>
+<main>
+<div class="mobile-bar">
+<button class="btn small primary" id="mobileStart">开始</button>
+<span class="mobile-timer" id="mobileTimer">00:00:00</span>
+<button class="btn small" id="mobilePause">暂停</button>
+<button class="btn small" id="mobileTheme">主题</button>
+</div>
+<div class="content">
+<header class="hero">
+<div class="hero-copy">
+<span class="eyebrow">CHAPTER 10 · 竞赛篇</span>
+<h1>数学概念与方法</h1>
+<p>算法竞赛里一半的题目，底子是<strong>数学</strong>。这一章装上最常用的数学工具：最大公约数、素数筛、快速幂、组合数与概率期望。</p>
+<div class="hero-tags">
+<span class="tag">gcd 与欧几里德</span>
+<span class="tag">埃氏筛</span>
+<span class="tag">快速幂</span>
+<span class="tag">同余与模</span>
+<span class="tag">组合数与概率</span>
+</div>
+<div class="hero-actions">
+<a class="btn primary" href="#plan">开始本章学习</a>
+<button class="btn" onclick="document.getElementById('number').scrollIntoView()">直接进入核心知识</button>
+</div>
+</div>
+<div aria-label="gcd 示例" class="hero-visual">
+<div class="code-block" style="box-shadow:none;border:1px solid var(--line)">
+<div class="code-head"><span class="code-title">程序 10-1 · 最大公约数</span><span class="code-lang">C++</span></div>
+<div class="code-body"><pre><code class="language-cpp">int gcd(int a, int b) {
+  return b == 0 ? a : gcd(b, a % b);
+}
+/* gcd(12, 18) = gcd(18,12) = gcd(12,6) = gcd(6,0) = 6 */</code></pre></div>
+</div>
+</div>
+</header>
+
+<section class="lesson" data-section="plan" id="plan">
+<div class="section-top">
+<div>
+<p class="section-kicker">PLAN · 路线</p>
+<h2>本章怎么学</h2>
+<p class="lead">学完本章，你会写 gcd、埃氏筛、快速幂，会用杨辉三角与组合数计数，并理解数学期望怎么算。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>五个学习目标</h3>
+<div class="grid-3">
+<div class="card"><div class="mini-title"><span class="icon">1</span>欧几里德算法</div><p>gcd 一行代码，$O(\log)$ 求最大公约数。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">2</span>埃氏筛</div><p>一次筛出所有素数，$O(n \log\log n)$。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">3</span>快速幂</div><p>$O(\log n)$ 算 $a^n \bmod m$，防溢出。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">4</span>同余与模</div><p>理解取模运算与负数取模的坑。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">5</span>组合数</div><p>杨辉三角求 $C(n,k)$，二项式定理。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">6</span>概率期望</div><p>会算简单离散概率与数学期望。</p></div>
+</div>
+
+<h3>建议时间安排</h3>
+<div class="timeline">
+<div class="time-block"><b>0–10 分钟</b><strong>预诊断</strong><span>5 题摸清起点</span></div>
+<div class="time-block"><b>10–40 分钟</b><strong>数论初步</strong><span>gcd + 筛法可视化</span></div>
+<div class="time-block"><b>40–70 分钟</b><strong>快速幂</strong><span>二进制拆分指数</span></div>
+<div class="time-block"><b>70–100 分钟</b><strong>计数</strong><span>杨辉三角可视化</span></div>
+<div class="time-block"><b>100–120 分钟</b><strong>概率期望</strong><span>公式与例题</span></div>
+<div class="time-block"><b>120–145 分钟</b><strong>训练 + 刷题</strong><span>3 道训练 + 错因记录</span></div>
+</div>
+
+<h3>学习主线</h3>
+<div class="method-flow">
+<div class="flow-node"><b>整除</b>gcd / 唯一分解</div>
+<div class="flow-node"><b>素数</b>埃氏筛</div>
+<div class="flow-node"><b>幂与模</b>快速幂</div>
+<div class="flow-node"><b>计数</b>组合数 / 概率</div>
+</div>
+
+<div class="card warning">
+<div class="mini-title"><span class="icon">⚠</span>先记住一句话</div>
+<p>数学题的代码往往很短，<strong>难在推导</strong>。拿到题先问：这是「数论、计数，还是概率」？然后套对应的工具。推导不出来时，先小数据打表找规律。</p>
+</div>
+</section>
+
+<section class="lesson" data-section="diagnosis" id="diagnosis">
+<div class="section-top">
+<div>
+<p class="section-kicker">DIAGNOSIS · 摸底</p>
+<h2>预诊断：先看你卡在哪里</h2>
+<p class="lead">共 5 题。凭直觉答完再看反馈。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="pre1">
+<div class="quiz-head"><strong>Q1｜gcd 的复杂度</strong><span class="pill">数论</span></div>
+<div class="quiz-body">
+<p>欧几里德算法（辗转相除）求 gcd(a,b) 的时间复杂度约是：</p>
+<div class="options">
+<label class="option"><input name="pre1" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">$O(a+b)$</span></span></label>
+<label class="option"><input name="pre1" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">$O(\log \max(a,b))$</span></span></label>
+<label class="option"><input name="pre1" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">$O(ab)$</span></span></label>
+<label class="option"><input name="pre1" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">$O(1)$</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="A" data-quiz="pre2">
+<div class="quiz-head"><strong>Q2｜埃氏筛做什么</strong><span class="pill">筛法</span></div>
+<div class="quiz-body">
+<p>埃氏筛（Eratosthenes）的核心操作是：</p>
+<div class="options">
+<label class="option"><input name="pre2" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">从 2 开始，把每个素数的倍数标记为合数</span></span></label>
+<label class="option"><input name="pre2" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">对每个数都做质因数分解</span></span></label>
+<label class="option"><input name="pre2" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">用快速幂求素数</span></span></label>
+<label class="option"><input name="pre2" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">随机猜素数</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="pre3">
+<div class="quiz-head"><strong>Q3｜快速幂</strong><span class="pill">快速幂</span></div>
+<div class="quiz-body">
+<p>快速幂把指数拆成二进制，计算 $a^n$ 大约需要多少次乘法？</p>
+<div class="options">
+<label class="option"><input name="pre3" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">$n$ 次</span></span></label>
+<label class="option"><input name="pre3" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">$\log n$ 次</span></span></label>
+<label class="option"><input name="pre3" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">$\sqrt{n}$ 次</span></span></label>
+<label class="option"><input name="pre3" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">$2n$ 次</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="A" data-quiz="pre4">
+<div class="quiz-head"><strong>Q4｜杨辉三角</strong><span class="pill">组合数</span></div>
+<div class="quiz-body">
+<p>杨辉三角第 n 行第 k 个数等于：</p>
+<div class="options">
+<label class="option"><input name="pre4" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">组合数 $C(n,k)$</span></span></label>
+<label class="option"><input name="pre4" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">$n^k$</span></span></label>
+<label class="option"><input name="pre4" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">$k^n$</span></span></label>
+<label class="option"><input name="pre4" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">斐波那契数</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="pre5">
+<div class="quiz-head"><strong>Q5｜取模的意义</strong><span class="pill">模运算</span></div>
+<div class="quiz-body">
+<p>竞赛里频繁对结果取模（如 mod 1e9+7）的主要目的是：</p>
+<div class="options">
+<label class="option"><input name="pre5" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">让程序更快</span></span></label>
+<label class="option"><input name="pre5" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">防止大数溢出，且答案只要求输出模值</span></span></label>
+<label class="option"><input name="pre5" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">让数字变小更好看</span></span></label>
+<label class="option"><input name="pre5" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">避免除法</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="number" id="number">
+<div class="section-top">
+<div>
+<p class="section-kicker">10.1 · NUMBER THEORY</p>
+<h2>数论初步：gcd 与筛法</h2>
+<p class="lead">数论是「整数的学问」。两个最常用的工具：最大公约数与素数筛。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. 欧几里德算法</h3>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 10-2 · gcd 与 lcm</span><span class="code-lang">C++</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int gcd(int a, int b) { return b == 0 ? a : gcd(b, a % b); }
+
+int main() {
+  int a = 12, b = 18;
+  int g = gcd(a, b);
+  cout &lt;&lt; g &lt;&lt; endl;                          /* 6 */
+  cout &lt;&lt; a / g * b &lt;&lt; endl;                 /* lcm = 36 */
+  return 0;
+}</code></pre></div>
+</div>
+<p>唯一分解定理：每个整数都能唯一写成素数幂的乘积。它告诉我们 gcd / lcm 的本质就是「取指数的最小/最大值」。</p>
+
+<h3>2. 埃氏筛</h3>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 10-3 · 筛出 1~n 的素数</span><span class="code-lang">C++</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-cpp">vector&lt;bool&gt; is_prime(n + 1, true);
+is_prime[0] = is_prime[1] = false;
+for (int i = 2; i * i &lt;= n; i++)
+  if (is_prime[i])
+    for (int j = i * i; j &lt;= n; j += i)   /* 从 i*i 开始标记 */
+      is_prime[j] = false;</code></pre></div>
+</div>
+
+<h3>3. 可视化：筛 2~30</h3>
+<div class="exec-stage" id="sieveStage">
+<div class="stage-title"><span class="icon">▶</span>埃氏筛过程</div>
+<div id="sieveGrid" style="display:grid;grid-template-columns:repeat(10,52px);gap:6px;margin-top:4px"></div>
+<div class="legend">
+<span class="lg"><span class="sw" style="background:var(--sage)"></span>素数</span>
+<span class="lg"><span class="sw" style="background:var(--surface-soft)"></span>合数（已标记）</span>
+<span class="lg"><span class="sw" style="background:var(--rose)"></span>当前素数</span>
+</div>
+<div class="exec-log" id="sieveLog" style="margin-top:8px"></div>
+<div class="exec-controls">
+<button class="btn primary" id="sieveNext">筛掉 2 的倍数</button>
+</div>
+</div>
+<style>#sieveGrid span{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 0;font-weight:700;text-align:center;font-family:ui-monospace,Consolas,monospace}#sieveGrid span.prime{background:var(--sage);color:#fff}#sieveGrid span.marked{background:var(--surface-soft);color:var(--muted)}#sieveGrid span.current{background:var(--rose);color:#fff}</style>
+
+<div class="quiz" data-correct="A" data-quiz="quiz-gcd">
+<div class="quiz-head"><strong>小测｜gcd</strong><span class="pill">数论</span></div>
+<div class="quiz-body">
+<p>gcd(12, 18) 等于：</p>
+<div class="options">
+<label class="option"><input name="quiz-gcd" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer"><span class="mono">6</span></span></span></label>
+<label class="option"><input name="quiz-gcd" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer"><span class="mono">3</span></span></span></label>
+<label class="option"><input name="quiz-gcd" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer"><span class="mono">12</span></span></span></label>
+<label class="option"><input name="quiz-gcd" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer"><span class="mono">36</span></span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="quiz-sieve">
+<div class="quiz-head"><strong>小测｜筛法第一步</strong><span class="pill">筛法</span></div>
+<div class="quiz-body">
+<p>筛 2~30 时，第一步应该：</p>
+<div class="options">
+<label class="option"><input name="quiz-sieve" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">把 1 的倍数全部标掉</span></span></label>
+<label class="option"><input name="quiz-sieve" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">把 2 的倍数（4、6、8…）标为合数</span></span></label>
+<label class="option"><input name="quiz-sieve" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">把 30 的倍数标掉</span></span></label>
+<label class="option"><input name="quiz-sieve" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">把奇数全部标掉</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="powmod" id="powmod">
+<div class="section-top">
+<div>
+<p class="section-kicker">10.2 · POWER</p>
+<h2>快速幂与取模</h2>
+<p class="lead">算 $a^n$ 不用乘 n 次：把指数拆成二进制，$O(\log n)$ 搞定。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. 快速幂</h3>
+<p>$3^{13} = 3^{1101_2} = 3^8 \cdot 3^4 \cdot 3^1$。把指数看成二进制，只看哪些位是 1，把对应的幂乘起来。代码用「底数平方、指数右移」实现：</p>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 10-4 · 快速幂取模</span><span class="code-lang">C++</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-cpp">long long qpow(long long a, long long n, long long mod) {
+  long long res = 1;
+  while (n) {
+    if (n &amp; 1) res = res * a % mod;   /* 当前位是 1 就乘上 */
+    a = a * a % mod;                  /* 底数平方 */
+    n &gt;&gt;= 1;                         /* 指数右移一位 */
+  }
+  return res;
+}</code></pre></div>
+</div>
+
+<h3>2. 取模的注意事项</h3>
+<div class="checklist">
+<div class="check-item"><span>① 大数相乘先取模再相乘：<code>(a % M) * (b % M) % M</code>，用 long long 防中间溢出。</span></div>
+<div class="check-item"><span>② C++ 负数取模结果是负数：<code>-5 % 3 = -2</code>，要转正写 <code>((x % M) + M) % M</code>。</span></div>
+<div class="check-item"><span>③ 常见的模数：1e9+7（质数，适合做逆元）、998244353（NTT 常用）。</span></div>
+</div>
+
+<div class="quiz" data-correct="C" data-quiz="quiz-pow">
+<div class="quiz-head"><strong>小测｜快速幂结果</strong><span class="pill">快速幂</span></div>
+<div class="quiz-body">
+<p>$3^4$ 用快速幂（或直接算）等于：</p>
+<div class="options">
+<label class="option"><input name="quiz-pow" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer"><span class="mono">12</span></span></span></label>
+<label class="option"><input name="quiz-pow" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer"><span class="mono">64</span></span></span></label>
+<label class="option"><input name="quiz-pow" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer"><span class="mono">81</span></span></span></label>
+<label class="option"><input name="quiz-pow" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer"><span class="mono">27</span></span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="count" id="count">
+<div class="section-top">
+<div>
+<p class="section-kicker">10.3 · COUNTING</p>
+<h2>计数与概率：杨辉三角</h2>
+<p class="lead">组合数 $C(n,k)$ 是计数的基石，杨辉三角就是组合数的表格。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. 杨辉三角 = 组合数表</h3>
+<div class="formula">$C(n,k) = C(n-1,k-1) + C(n-1,k)$，边界 $C(n,0)=C(n,n)=1$</div>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 10-5 · 递推求组合数</span><span class="code-lang">C++</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-cpp">long long C[35][35];
+for (int i = 0; i &lt;= n; i++) {
+  C[i][0] = C[i][i] = 1;
+  for (int j = 1; j &lt; i; j++)
+    C[i][j] = C[i - 1][j - 1] + C[i - 1][j];
+}</code></pre></div>
+</div>
+<p>离散概率：某事件的概率 = 有利情况数 ÷ 总情况数。组合数就是数「有利情况」最常用的工具。</p>
+
+<h3>2. 可视化：一行一行生成</h3>
+<div class="exec-stage" id="pascalStage">
+<div class="stage-title"><span class="icon">▶</span>杨辉三角生成</div>
+<div id="pascalBox" style="display:grid;gap:6px;margin-top:4px"></div>
+<div class="exec-log" id="pascalLog" style="margin-top:8px">点击生成下一行。</div>
+<div class="exec-controls">
+<button class="btn primary" id="pascalNext">生成下一行</button>
+</div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="quiz-comb">
+<div class="quiz-head"><strong>小测｜组合数</strong><span class="pill">计数</span></div>
+<div class="quiz-body">
+<p>$C(5,2)$ 等于：</p>
+<div class="options">
+<label class="option"><input name="quiz-comb" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer"><span class="mono">5</span></span></span></label>
+<label class="option"><input name="quiz-comb" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer"><span class="mono">10</span></span></span></label>
+<label class="option"><input name="quiz-comb" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer"><span class="mono">20</span></span></span></label>
+<label class="option"><input name="quiz-comb" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer"><span class="mono">25</span></span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="expect" id="expect">
+<div class="section-top">
+<div>
+<p class="section-kicker">10.4 · EXPECTATION</p>
+<h2>递推与数学期望</h2>
+<p class="lead">很多概率题最终化成递推；期望则常配合「线性期望」简化计算。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. 数学期望</h3>
+<p>随机变量 X 的期望 $E(X) = \sum x_i \cdot P(x_i)$。关键性质：<strong>期望的线性性</strong>——$E(X+Y)=E(X)+E(Y)$，不管 X、Y 是否独立。这常把「复杂期望」拆成「简单期望之和」。</p>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 10-6 · 掷骰子期望</span><span class="code-lang">C++</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-cpp">// 掷一枚均匀骰子，点数的期望
+double e = 0;
+for (int i = 1; i &lt;= 6; i++) e += i * (1.0 / 6);
+cout &lt;&lt; e &lt;&lt; endl;   // 3.5</code></pre></div>
+</div>
+
+<h3>2. 递推的例子</h3>
+<div class="keyline">
+<p><strong>错排问题（概念）：</strong>n 封信全部装错信封的方案数 $D_n = (n-1)(D_{n-1}+D_{n-2})$，$D_1=0,D_2=1$。很多计数题都是「先想递推式，再填表」。</p>
+</div>
+
+<div class="collapse-wrap">
+<button class="collapse-head" data-collapse="expect-why"><span class="chev">▶</span>为什么递推是数学题的万能起点？<span style="margin-left:auto;color:var(--muted);font-weight:400;font-size:13px">点开看</span></button>
+<div class="collapse-body" id="expect-why">
+<p>小规模问题通常能靠枚举或手算验证；一旦找到「第 n 项怎么由前面的项推出」，就能用循环填表。所以做题流程常是：<strong>小数据打表 → 找规律 → 写递推 → 验证</strong>。</p>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="practice" id="practice">
+<div class="section-top">
+<div>
+<p class="section-kicker">10.5 · TRAINING</p>
+<h2>本章训练：限时检验真实掌握</h2>
+<p class="lead">三题闭卷完成，先写答案再核对；错了就把原因写进「错因记录」。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<div class="practice-card">
+<div class="practice-meta"><span class="pill core">训练 1 · 填空计算</span><span class="pill">gcd</span></div>
+<h3>写出运行结果</h3>
+<p>gcd(24, 36) 等于多少？</p>
+<div class="answer-row">
+<input type="text" data-save="p1-answer" placeholder="输入数值"/>
+<button class="btn small primary" onclick="checkNumeric('p1-answer', 12, 'fb-p1', '正确！24 和 36 的最大公约数是 12。', '不对。24 的约数有 12，36 的约数也有 12，最大是 12。')">检查</button>
+</div>
+<div aria-live="polite" class="feedback" id="fb-p1"></div>
+<div class="practice-actions">
+<button class="btn small" data-reveal="p1-solution">查看答案</button>
+<button class="btn small" data-reveal="p1-hint">查看提示</button>
+</div>
+<div class="hint" id="p1-hint">24=2³×3，36=2²×3²，取最小指数。</div>
+<div class="solution" id="p1-solution">答案是 <span class="mono">12</span>。</div>
+</div>
+
+<div class="practice-card">
+<div class="practice-meta"><span class="pill core">训练 2 · 填空计算</span><span class="pill">快速幂</span></div>
+<h3>写出运行结果</h3>
+<p>$2^{10}$ 等于多少？</p>
+<div class="answer-row">
+<input type="text" data-save="p2-answer" placeholder="输入数值"/>
+<button class="btn small primary" onclick="checkNumeric('p2-answer', 1024, 'fb-p2', '正确！2^10 = 1024。', '不对。2^10 = 1024。')">检查</button>
+</div>
+<div aria-live="polite" class="feedback" id="fb-p2"></div>
+<div class="practice-actions">
+<button class="btn small" data-reveal="p2-solution">查看答案</button>
+<button class="btn small" data-reveal="p2-hint">查看提示</button>
+</div>
+<div class="hint" id="p2-hint">2 的 10 次方 = 1024（1K）。</div>
+<div class="solution" id="p2-solution">答案是 <span class="mono">1024</span>。</div>
+</div>
+
+<div class="practice-card">
+<div class="practice-meta"><span class="pill core">训练 3 · 填空计算</span><span class="pill">组合数</span></div>
+<h3>写出运行结果</h3>
+<p>$C(6,2)$ 等于多少？</p>
+<div class="answer-row">
+<input type="text" data-save="p3-answer" placeholder="输入数值"/>
+<button class="btn small primary" onclick="checkNumeric('p3-answer', 15, 'fb-p3', '正确！C(6,2) = 6×5/2 = 15。', '不对。C(6,2)=6!/(2!4!)=6×5/2=15。')">检查</button>
+</div>
+<div aria-live="polite" class="feedback" id="fb-p3"></div>
+<div class="practice-actions">
+<button class="btn small" data-reveal="p3-solution">查看答案</button>
+<button class="btn small" data-reveal="p3-hint">查看提示</button>
+</div>
+<div class="hint" id="p3-hint">从 6 个里选 2 个：6×5÷2。</div>
+<div class="solution" id="p3-solution">答案是 <span class="mono">15</span>。</div>
+</div>
+
+<h3>刷题清单：把数学用到赛场上</h3>
+<p>这 8 道题专门练「gcd、素数、快速幂、组合计数」：</p>
+<div class="oj-grid">
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P3383" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P3383</span></div>
+<h4>【模板】线性筛素数</h4>
+<p>筛出 1~n 的所有素数。</p>
+<p class="oj-why">为什么做：埃氏筛 / 线性筛模板题，先 AC 再比较两种筛法。</p>
+</a>
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P1029" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P1029</span></div>
+<h4>最大公约数和最小公倍数问题</h4>
+<p>已知 gcd 和 lcm 求可能的数对。</p>
+<p class="oj-why">为什么做：gcd/lcm 关系 + 枚举约数，经典数论题。</p>
+</a>
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P1036" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P1036</span></div>
+<h4>选数</h4>
+<p>n 个数里选 k 个，和为素数的情况数。</p>
+<p class="oj-why">为什么做：组合枚举 + 素数判断，数论与暴力的结合。</p>
+</a>
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P1865" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P1865</span></div>
+<h4>A % B Problem</h4>
+<p>区间素数个数（前缀和）。</p>
+<p class="oj-why">为什么做：筛法 + 前缀和，为后续算法打底。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/1328/A" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">1328A</span></div>
+<h4>Divisibility Problem</h4>
+<p>最少加几次能被整除。</p>
+<p class="oj-why">为什么做：取模数学，一行公式，练「用数学代替模拟」。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/1475/A" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">1475A</span></div>
+<h4>Odd Divisor</h4>
+<p>判断是否存在奇数因子。</p>
+<p class="oj-why">为什么做：唯一分解定理的应用，n 是 2 的幂则没有奇数因子。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/1077/A" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">1077A</span></div>
+<h4>Frog Jumping</h4>
+<p>青蛙交替跳，求最终位置。</p>
+<p class="oj-why">为什么做：奇偶讨论 + 公式，练「分类讨论」。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/1294/A" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">1294A</span></div>
+<h4>Collecting Coins</h4>
+<p>平分硬币问题。</p>
+<p class="oj-why">为什么做：整除 + 贪心的数学题。</p>
+</a>
+</div>
+
+<h3>错因记录</h3>
+<p>今天做错的题、踩过的坑，写在这里。</p>
+<textarea data-save="mistake-log" placeholder="例：负数取模结果不对，忘了 (x%M+M)%M；C(5,2) 算成 20……"></textarea>
+</section>
+
+<section class="lesson" data-section="finish" id="finish">
+<div class="section-top">
+<div>
+<p class="section-kicker">FINISH · 通关</p>
+<h2>今日通关总结</h2>
+<p class="lead">先闭卷完成下面两项，再看掌握度。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>要点自检</h3>
+<div class="checklist">
+<label class="check-item"><input type="checkbox" data-save-check="c1"/><span>我会一行写 gcd，知道 lcm = a/g*b。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c2"/><span>我会写埃氏筛（从 i*i 开始标记倍数）。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c3"/><span>我会写快速幂取模，并知道负数取模要转正。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c4"/><span>我会用杨辉三角递推求组合数。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c5"/><span>我理解数学期望与期望的线性性。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c6"/><span>我已经在洛谷或 Codeforces 上 AC 了一道数论/计数题。</span></label>
+</div>
+
+<h3>闭卷写出「方法口诀」</h3>
+<p>快速幂把指数拆成 <strong><input type="text" data-save="finish-method" placeholder="三个字" style="display:inline-block;width:130px;min-height:38px;padding:6px 10px"/></strong>，底数平方、指数右移。</p>
+<button class="btn small primary" onclick="checkExact('finish-method', '二进制', 'fb-method', '正确！指数拆成二进制。', '答案是：二进制。')">检查</button>
+<div aria-live="polite" class="feedback" id="fb-method"></div>
+
+<h3>用一句话总结本章</h3>
+<textarea data-save="final-summary" placeholder="例：gcd 和快速幂背下来了，杨辉三角原来就是组合数表……"></textarea>
+
+<div class="score-panel" style="margin-top:22px">
+<div class="card" style="display:grid;place-items:center;text-align:center">
+<div class="score-ring" id="scoreRing"><span id="scoreValue">0%</span></div>
+<p style="color:var(--muted);font-size:14px;margin:10px 0 0">本章掌握度 = 测验25% + 进度25% + 自检25% + 训练25%</p>
+</div>
+<div class="card">
+<h3 style="margin-top:0">当前水平</h3>
+<p id="levelText" style="font-size:18px;color:var(--ink-soft)">还没开始？完成上面的题目后这里会显示你的掌握度。</p>
+<div class="practice-actions">
+<button class="btn primary" id="exportBtn2" onclick="exportRecord()">导出学习记录</button>
+<button class="btn danger" onclick="resetAllProgress()">清空本页进度</button>
+</div>
+<p style="color:var(--muted);font-size:14px;margin-top:12px">提示：学习记录会保存成 txt 文件，方便你复盘。</p>
+</div>
+</div>
+</section>
+
+<footer>
+<p>本站内容为原创讲解与原创示例代码，知识体系参考《算法竞赛入门经典（第2版）》刘汝佳 著。</p>
+<p><a href="../../index.html">返回章节总览</a> · 上一章：<a href="../ch09/index.html">第9章 动态规划初步</a> · 下一章：<a href="../ch11/index.html">第11章 图论模型与算法</a></p>
+</footer>
+</div>
+</main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<script src="../../assets/js/ch10.js"></script>
+<script src="../../assets/js/lesson.js"></script>
+</body>
+</html>

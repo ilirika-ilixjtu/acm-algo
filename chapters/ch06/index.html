@@ -1,0 +1,654 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="description" content="算法竞赛入门 · 第6章《数据结构基础》交互式学习：栈与队列、链表、二叉树遍历、图的 DFS/BFS。"/>
+<meta content="#F2EFE9" name="theme-color"/>
+<meta content="dark light" name="color-scheme"/>
+<title>第6章 数据结构基础 · 算法竞赛入门交互课</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg"/>
+<link rel="stylesheet" href="../../assets/css/lesson.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css"/>
+<script>
+window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] } };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+</head>
+<body>
+<div class="page-grid">
+<aside aria-label="课程导航" class="sidebar">
+<a class="back-link" href="../../index.html">← 返回章节总览</a>
+<div class="brand">
+<div class="brand-mark">AC</div>
+<div><strong>算法入门 Lab</strong><small>第6章 · 数据结构基础</small></div>
+</div>
+<div class="timer-card">
+<div class="timer-label">本章总计时</div>
+<div class="timer-display" id="timerDisplay">00:00:00</div>
+<div class="timer-actions">
+<button class="btn primary" id="timerStart">开始</button>
+<button class="btn" id="timerPause">暂停</button>
+<button class="btn ghost" id="timerReset">重置计时</button>
+</div>
+</div>
+<div class="progress-wrap">
+<div class="progress-row"><span>课程进度</span><span id="progressText">0 / 8</span></div>
+<div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+</div>
+<div class="nav-title">学习路线</div>
+<nav class="nav-list" id="sideNav">
+<a class="nav-link" href="#plan"><span class="nav-dot"></span>0. 本章路线</a>
+<a class="nav-link" href="#diagnosis"><span class="nav-dot"></span>1. 预诊断</a>
+<a class="nav-link" href="#stack-queue"><span class="nav-dot"></span>2. 栈与队列</a>
+<a class="nav-link" href="#linked"><span class="nav-dot"></span>3. 链表</a>
+<a class="nav-link" href="#tree"><span class="nav-dot"></span>4. 树和二叉树</a>
+<a class="nav-link" href="#graph"><span class="nav-dot"></span>5. 图：DFS 与 BFS</a>
+<a class="nav-link" href="#practice"><span class="nav-dot"></span>6. 本章训练</a>
+<a class="nav-link" href="#finish"><span class="nav-dot"></span>7. 通关总结</a>
+</nav>
+<div class="side-tools">
+<button class="btn small" id="themeToggle">切换夜雾</button>
+<button class="btn small" id="exportBtn">导出记录</button>
+</div>
+</aside>
+<main>
+<div class="mobile-bar">
+<button class="btn small primary" id="mobileStart">开始</button>
+<span class="mobile-timer" id="mobileTimer">00:00:00</span>
+<button class="btn small" id="mobilePause">暂停</button>
+<button class="btn small" id="mobileTheme">主题</button>
+</div>
+<div class="content">
+<header class="hero">
+<div class="hero-copy">
+<span class="eyebrow">CHAPTER 6 · 基础篇</span>
+<h1>数据结构基础</h1>
+<p>基础篇开始。这一章把四件「武器」装进你的工具箱：<strong>栈、队列、树、图</strong>。它们不是考点，而是后面几乎所有算法的「地基」。</p>
+<div class="hero-tags">
+<span class="tag">栈 LIFO / 队列 FIFO</span>
+<span class="tag">二叉树遍历</span>
+<span class="tag">DFS / BFS</span>
+<span class="tag">拓扑排序</span>
+<span class="tag">容器可视化</span>
+</div>
+<div class="hero-actions">
+<a class="btn primary" href="#plan">开始本章学习</a>
+<button class="btn" onclick="document.getElementById('stack-queue').scrollIntoView()">直接进入核心知识</button>
+</div>
+</div>
+<div aria-label="队列 BFS 示例" class="hero-visual">
+<div class="code-block" style="box-shadow:none;border:1px solid var(--line)">
+<div class="code-head"><span class="code-title">程序 6-1 · BFS 最短路的骨架</span><span class="code-lang">C++</span></div>
+<div class="code-body"><pre><code class="language-cpp">queue&lt;int&gt; q;
+q.push(start); d[start] = 0;
+while (!q.empty()) {
+  int u = q.front(); q.pop();
+  for (int v : g[u])
+    if (d[v] == -1) { d[v] = d[u] + 1; q.push(v); }
+}</code></pre></div>
+</div>
+</div>
+</header>
+
+<section class="lesson" data-section="plan" id="plan">
+<div class="section-top">
+<div>
+<p class="section-kicker">PLAN · 路线</p>
+<h2>本章怎么学</h2>
+<p class="lead">学完本章，你能用栈/队列处理顺序问题，用数组模拟链表，会二叉树的三种遍历，并用 BFS 在图上求最短距离。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>五个学习目标</h3>
+<div class="grid-3">
+<div class="card"><div class="mini-title"><span class="icon">1</span>栈</div><p>后进先出 LIFO：压栈、弹栈、栈顶。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">2</span>队列</div><p>先进先出 FIFO：入队、出队、队头队尾。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">3</span>链表</div><p>会写数组模拟链表：next / prev 指针域。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">4</span>二叉树</div><p>理解先序、中序、后序、层次遍历。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">5</span>图遍历</div><p>会用 DFS 求连通块、BFS 求最短路。</p></div>
+<div class="card"><div class="mini-title"><span class="icon">6</span>拓扑排序</div><p>理解有向无环图的线性排序。</p></div>
+</div>
+
+<h3>建议时间安排</h3>
+<div class="timeline">
+<div class="time-block"><b>0–10 分钟</b><strong>预诊断</strong><span>5 题摸清起点</span></div>
+<div class="time-block"><b>10–40 分钟</b><strong>栈与队列</strong><span>push/pop 可视化</span></div>
+<div class="time-block"><b>40–60 分钟</b><strong>链表</strong><span>数组模拟 next</span></div>
+<div class="time-block"><b>60–90 分钟</b><strong>二叉树</strong><span>三种遍历 + 可视化</span></div>
+<div class="time-block"><b>90–120 分钟</b><strong>图遍历</strong><span>DFS 连通块 / BFS 最短路</span></div>
+<div class="time-block"><b>120–145 分钟</b><strong>训练 + 刷题</strong><span>3 道训练 + 错因记录</span></div>
+</div>
+
+<h3>学习主线</h3>
+<div class="method-flow">
+<div class="flow-node"><b>线性</b>栈 / 队列 / 链表</div>
+<div class="flow-node"><b>树形</b>二叉树与遍历</div>
+<div class="flow-node"><b>图形</b>DFS / BFS</div>
+<div class="flow-node"><b>应用</b>连通块 / 最短路 / 拓扑</div>
+</div>
+
+<div class="card warning">
+<div class="mini-title"><span class="icon">⚠</span>先记住一句话</div>
+<p>选数据结构的口诀：<strong>先进后出用栈，先进先出用队列，一对多关系用树，任意关系用图。</strong>后面每道题先问自己：数据之间是什么关系？</p>
+</div>
+</section>
+
+<section class="lesson" data-section="diagnosis" id="diagnosis">
+<div class="section-top">
+<div>
+<p class="section-kicker">DIAGNOSIS · 摸底</p>
+<h2>预诊断：先看你卡在哪里</h2>
+<p class="lead">共 5 题。凭直觉答完再看反馈。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="pre1">
+<div class="quiz-head"><strong>Q1｜栈的特性</strong><span class="pill">栈</span></div>
+<div class="quiz-body">
+<p>栈（stack）的核心特性是：</p>
+<div class="options">
+<label class="option"><input name="pre1" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">先进先出（FIFO）</span></span></label>
+<label class="option"><input name="pre1" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">后进先出（LIFO）</span></span></label>
+<label class="option"><input name="pre1" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">随机访问</span></span></label>
+<label class="option"><input name="pre1" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">自动排序</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="A" data-quiz="pre2">
+<div class="quiz-head"><strong>Q2｜队列的特性</strong><span class="pill">队列</span></div>
+<div class="quiz-body">
+<p>队列（queue）的核心特性是：</p>
+<div class="options">
+<label class="option"><input name="pre2" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">先进先出（FIFO）</span></span></label>
+<label class="option"><input name="pre2" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">后进先出（LIFO）</span></span></label>
+<label class="option"><input name="pre2" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">按大小出队</span></span></label>
+<label class="option"><input name="pre2" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">随机出队</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="pre3">
+<div class="quiz-head"><strong>Q3｜二叉树第 h 层</strong><span class="pill">二叉树</span></div>
+<div class="quiz-body">
+<p>满二叉树第 h 层最多有多少个节点（根在第 1 层）？</p>
+<div class="options">
+<label class="option"><input name="pre3" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">$2^h$</span></span></label>
+<label class="option"><input name="pre3" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">$2^{h-1}$</span></span></label>
+<label class="option"><input name="pre3" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">$h$</span></span></label>
+<label class="option"><input name="pre3" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">$2h$</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="pre4">
+<div class="quiz-head"><strong>Q4｜后序遍历</strong><span class="pill">遍历</span></div>
+<div class="quiz-body">
+<p>二叉树后序遍历的顺序是：</p>
+<div class="options">
+<label class="option"><input name="pre4" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">根 → 左 → 右</span></span></label>
+<label class="option"><input name="pre4" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">左 → 右 → 根</span></span></label>
+<label class="option"><input name="pre4" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">左 → 根 → 右</span></span></label>
+<label class="option"><input name="pre4" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">右 → 左 → 根</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="pre5">
+<div class="quiz-head"><strong>Q5｜无权图最短路</strong><span class="pill">BFS</span></div>
+<div class="quiz-body">
+<p>在无权图上求单源最短路，用哪种遍历？</p>
+<div class="options">
+<label class="option"><input name="pre5" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">DFS 深度优先</span></span></label>
+<label class="option"><input name="pre5" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">BFS 广度优先（队列逐层扩展）</span></span></label>
+<label class="option"><input name="pre5" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">随便哪种都行</span></span></label>
+<label class="option"><input name="pre5" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">必须用递归</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="stack-queue" id="stack-queue">
+<div class="section-top">
+<div>
+<p class="section-kicker">6.1 · STACK &amp; QUEUE</p>
+<h2>栈与队列：两种「排队规则」</h2>
+<p class="lead">栈像叠盘子（后放先取），队列像排队买饭（先来先服务）。C++ 的 STL 里都有现成的。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. 栈：后进先出 LIFO</h3>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 6-2 · 栈的基本操作</span><span class="code-lang">C++</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;stack&gt;
+using namespace std;
+
+int main() {
+  stack&lt;int&gt; s;
+  s.push(1); s.push(2); s.push(3);  /* 压栈 */
+  cout &lt;&lt; s.top() &lt;&lt; endl;           /* 3，只看栈顶 */
+  s.pop();                          /* 弹出 3 */
+  cout &lt;&lt; s.size() &lt;&lt; endl;         /* 2 */
+  return 0;
+}</code></pre></div>
+</div>
+
+<div class="exec-stage" id="stackStage">
+<div class="stage-title"><span class="icon">▶</span>栈 push / pop 演示</div>
+<div class="practice-actions" style="margin-top:0">
+<button class="btn small primary" id="stackPush">push 一个数</button>
+<button class="btn small" id="stackPop">pop</button>
+</div>
+<div id="stackBox" style="display:flex;flex-direction:column;gap:6px;margin-top:12px;min-height:60px;width:140px"></div>
+<div class="exec-log" id="stackLog" style="margin-top:10px">栈是空的。</div>
+</div>
+
+<div class="quiz" data-correct="B" data-quiz="quiz-stack">
+<div class="quiz-head"><strong>小测｜出栈顺序</strong><span class="pill">栈</span></div>
+<div class="quiz-body">
+<p>依次 push 1、2、3，再连续 pop 到空，出栈顺序是：</p>
+<div class="options">
+<label class="option"><input name="quiz-stack" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer"><span class="mono">1 2 3</span></span></span></label>
+<label class="option"><input name="quiz-stack" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer"><span class="mono">3 2 1</span></span></span></label>
+<label class="option"><input name="quiz-stack" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer"><span class="mono">1 3 2</span></span></span></label>
+<label class="option"><input name="quiz-stack" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer"><span class="mono">2 3 1</span></span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<h3>2. 队列：先进先出 FIFO</h3>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 6-3 · 队列的基本操作</span><span class="code-lang">C++</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;queue&gt;
+using namespace std;
+
+int main() {
+  queue&lt;int&gt; q;
+  q.push(1); q.push(2); q.push(3);  /* 入队 */
+  cout &lt;&lt; q.front() &lt;&lt; endl;         /* 1，队头 */
+  q.pop();                          /* 1 出队 */
+  cout &lt;&lt; q.front() &lt;&lt; endl;         /* 2 */
+  return 0;
+}</code></pre></div>
+</div>
+
+<div class="exec-stage" id="queueStage">
+<div class="stage-title"><span class="icon">▶</span>队列 enqueue / dequeue 演示</div>
+<div class="practice-actions" style="margin-top:0">
+<button class="btn small primary" id="queueEnq">入队一个数</button>
+<button class="btn small" id="queueDeq">出队</button>
+</div>
+<div id="queueBox" style="display:flex;gap:6px;margin-top:12px;min-height:60px"></div>
+<div class="exec-log" id="queueLog" style="margin-top:10px">队列是空的。</div>
+</div>
+
+<div class="quiz" data-correct="A" data-quiz="quiz-queue">
+<div class="quiz-head"><strong>小测｜出队顺序</strong><span class="pill">队列</span></div>
+<div class="quiz-body">
+<p>依次入队 1、2、3，再连续出队到空，出队顺序是：</p>
+<div class="options">
+<label class="option"><input name="quiz-queue" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer"><span class="mono">1 2 3</span></span></span></label>
+<label class="option"><input name="quiz-queue" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer"><span class="mono">3 2 1</span></span></span></label>
+<label class="option"><input name="quiz-queue" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer"><span class="mono">2 1 3</span></span></span></label>
+<label class="option"><input name="quiz-queue" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer"><span class="mono">3 1 2</span></span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="linked" id="linked">
+<div class="section-top">
+<div>
+<p class="section-kicker">6.2 · LINKED LIST</p>
+<h2>链表：用数组模拟「指针」</h2>
+<p class="lead">竞赛里链表一般不用 new，而是用数组存「下一个节点的下标」，快且好调试。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. 数组模拟链表</h3>
+<p>每个节点存两个信息：数据 data[i]，以及「下一个节点是谁」next[i]。遍历时从 head 开始，一路顺着 next 走。</p>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 6-4 · 数组链表：输出整条链</span><span class="code-lang">C++</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+
+int main() {
+  int data[5] = {3, 7, 1, 9, 4};
+  int nxt[5]  = {1, 2, 3, 4, -1};   /* -1 表示链尾 */
+  int head = 0;
+  for (int i = head; i != -1; i = nxt[i])
+    cout &lt;&lt; data[i] &lt;&lt; " ";          /* 3 7 1 9 4 */
+  cout &lt;&lt; endl;
+  return 0;
+}</code></pre></div>
+</div>
+<p>想删除某个节点，只要让它的前驱跳过它：<code>nxt[prev] = nxt[del]</code>——不需要搬动数据，这就是链表的优势。</p>
+
+<div class="keyline">
+<p><strong>数组 vs 链表：</strong>数组按下标 $O(1)$ 随机访问，但中间插入/删除要搬元素；链表插入/删除只需改指针，却要 $O(n)$ 找位置。理解「读多写少用数组，改多则用链表」。</p>
+</div>
+</section>
+
+<section class="lesson" data-section="tree" id="tree">
+<div class="section-top">
+<div>
+<p class="section-kicker">6.3 · TREE</p>
+<h2>树和二叉树：一对多的结构</h2>
+<p class="lead">树是「有一个根、每个节点最多一个父亲」的结构；二叉树是每个节点最多两个孩子。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. 三种递归遍历</h3>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 6-5 · 先序 / 中序 / 后序</span><span class="code-lang">C++</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-cpp">void pre(int u)  { cout &lt;&lt; u &lt;&lt; " "; pre(l[u]); pre(r[u]); }  /* 根左右 */
+void in(int u)   { in(l[u]);  cout &lt;&lt; u &lt;&lt; " "; in(r[u]); }   /* 左根右 */
+void post(int u) { post(l[u]); post(r[u]); cout &lt;&lt; u &lt;&lt; " "; } /* 左右根 */</code></pre></div>
+</div>
+
+<h3>2. 可视化：先序遍历一棵小树</h3>
+<div class="exec-stage" id="treeStage">
+<div class="stage-title"><span class="icon">▶</span>先序遍历（根 → 左 → 右）</div>
+<svg viewBox="0 0 460 190" role="img" aria-label="一棵二叉树">
+<line x1="150" y1="55" x2="80" y2="130" stroke="var(--line-strong)" stroke-width="2"/>
+<line x1="150" y1="55" x2="220" y2="130" stroke="var(--line-strong)" stroke-width="2"/>
+<line x1="80" y1="130" x2="30" y2="180" stroke="var(--line-strong)" stroke-width="2"/>
+<line x1="80" y1="130" x2="130" y2="180" stroke="var(--line-strong)" stroke-width="2"/>
+<circle id="t1" cx="150" cy="35" r="22" fill="var(--surface)" stroke="var(--sage-deep)" stroke-width="2"/>
+<circle id="t2" cx="80" cy="130" r="22" fill="var(--surface)" stroke="var(--sage-deep)" stroke-width="2"/>
+<circle id="t3" cx="220" cy="130" r="22" fill="var(--surface)" stroke="var(--sage-deep)" stroke-width="2"/>
+<circle id="t4" cx="30" cy="180" r="22" fill="var(--surface)" stroke="var(--sage-deep)" stroke-width="2"/>
+<circle id="t5" cx="130" cy="180" r="22" fill="var(--surface)" stroke="var(--sage-deep)" stroke-width="2"/>
+<text x="150" y="41" text-anchor="middle" font-size="16" font-weight="700" fill="var(--ink)">1</text>
+<text x="80" y="136" text-anchor="middle" font-size="16" font-weight="700" fill="var(--ink)">2</text>
+<text x="220" y="136" text-anchor="middle" font-size="16" font-weight="700" fill="var(--ink)">3</text>
+<text x="30" y="186" text-anchor="middle" font-size="16" font-weight="700" fill="var(--ink)">4</text>
+<text x="130" y="186" text-anchor="middle" font-size="16" font-weight="700" fill="var(--ink)">5</text>
+</svg>
+<div class="exec-log" id="treeLog" style="margin-top:6px">从根 1 开始，先访问根。</div>
+<div class="exec-controls">
+<button class="btn primary" id="treeNext">访问第 1 个节点</button>
+<strong id="treeOut" style="color:var(--sage-deep);font-size:16px"></strong>
+</div>
+</div>
+<style>.tree-n { transition:.18s ease; } #treeStage circle.visited { fill: var(--sage); stroke: var(--sage-deep); } #treeStage circle.current { fill: var(--rose); stroke: var(--rose); }</style>
+
+<div class="quiz" data-correct="A" data-quiz="quiz-tree">
+<div class="quiz-head"><strong>小测｜先序遍历</strong><span class="pill">遍历</span></div>
+<div class="quiz-body">
+<p>上面这棵树（1 的孩子是 2、3；2 的孩子是 4、5）先序遍历的结果是：</p>
+<div class="options">
+<label class="option"><input name="quiz-tree" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer"><span class="mono">1 2 4 5 3</span></span></span></label>
+<label class="option"><input name="quiz-tree" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer"><span class="mono">1 2 3 4 5</span></span></span></label>
+<label class="option"><input name="quiz-tree" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer"><span class="mono">4 2 5 1 3</span></span></span></label>
+<label class="option"><input name="quiz-tree" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer"><span class="mono">2 4 5 3 1</span></span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="graph" id="graph">
+<div class="section-top">
+<div>
+<p class="section-kicker">6.4 · GRAPH</p>
+<h2>图：DFS 与 BFS</h2>
+<p class="lead">图是任意两点之间都可以有边的结构。遍历图有两种方式：能走多深走多深（DFS），逐层扩散（BFS）。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>1. DFS：求连通块</h3>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 6-6 · DFS 统计连通块</span><span class="code-lang">C++</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-cpp">void dfs(int u) {
+  vis[u] = 1;
+  for (int v : g[u])
+    if (!vis[v]) dfs(v);
+}
+int cnt = 0;
+for (int i = 1; i &lt;= n; i++)
+  if (!vis[i]) { cnt++; dfs(i); }   /* 每个起点 = 一个连通块 */</code></pre></div>
+</div>
+
+<h3>2. BFS：求无权图最短路</h3>
+<div class="code-block">
+<div class="code-head"><span class="code-title">程序 6-7 · BFS 最短距离</span><span class="code-lang">C++</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<div class="code-body"><pre><code class="language-cpp">queue&lt;int&gt; q;
+memset(d, -1, sizeof(d));      /* -1 表示没访问过 */
+d[s] = 0; q.push(s);
+while (!q.empty()) {
+  int u = q.front(); q.pop();
+  for (int v : g[u])
+    if (d[v] == -1) {
+      d[v] = d[u] + 1;
+      q.push(v);
+    }
+}</code></pre></div>
+</div>
+<p>BFS 用队列逐层扩展，所以第一次到达某个点时走的就是最短路径——这是「BFS 求最短路」的核心原理。DFS 用递归或栈，适合枚举路径、求连通块。</p>
+
+<div class="quiz" data-correct="A" data-quiz="quiz-bfs">
+<div class="quiz-head"><strong>小测｜BFS 原理</strong><span class="pill">BFS</span></div>
+<div class="quiz-body">
+<p>为什么 BFS 能求无权图最短路？</p>
+<div class="options">
+<label class="option"><input name="quiz-bfs" type="radio" value="A"/><span class="option-content"><span class="option-letter">A.</span><span class="option-answer">它按层扩展，第一次到达某点就是最短</span></span></label>
+<label class="option"><input name="quiz-bfs" type="radio" value="B"/><span class="option-content"><span class="option-letter">B.</span><span class="option-answer">它每次随机跳一个点</span></span></label>
+<label class="option"><input name="quiz-bfs" type="radio" value="C"/><span class="option-content"><span class="option-letter">C.</span><span class="option-answer">它先走最长的那条路</span></span></label>
+<label class="option"><input name="quiz-bfs" type="radio" value="D"/><span class="option-content"><span class="option-letter">D.</span><span class="option-answer">它靠猜</span></span></label>
+</div>
+<button class="btn small primary quiz-check">检查</button>
+<div aria-live="polite" class="feedback" role="status"></div>
+</div>
+</div>
+
+<div class="collapse-wrap">
+<button class="collapse-head" data-collapse="topo"><span class="chev">▶</span>拓扑排序是什么？<span style="margin-left:auto;color:var(--muted);font-weight:400;font-size:13px">点开看</span></button>
+<div class="collapse-body" id="topo">
+<p>拓扑排序把有向无环图（DAG）的节点排成一行，使得每条边都「从前往后」。做法：不断取出「入度为 0」的节点。典型应用：课程先修顺序、编译依赖。第11章还会用到。</p>
+</div>
+</div>
+</section>
+
+<section class="lesson" data-section="practice" id="practice">
+<div class="section-top">
+<div>
+<p class="section-kicker">6.5 · TRAINING</p>
+<h2>本章训练：限时检验真实掌握</h2>
+<p class="lead">三题闭卷完成，先写答案再核对；错了就把原因写进「错因记录」。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<div class="practice-card">
+<div class="practice-meta"><span class="pill core">训练 1 · 填空计算</span><span class="pill">栈</span></div>
+<h3>写出运行结果</h3>
+<p>依次 push 1、2、3，然后 pop 两次。此时栈顶元素是多少？</p>
+<div class="answer-row">
+<input type="text" data-save="p1-answer" placeholder="输入数值"/>
+<button class="btn small primary" onclick="checkNumeric('p1-answer', 1, 'fb-p1', '正确！pop 掉 3 和 2 后，栈顶是 1。', '不对。push 1 2 3 后 pop 两次：先出 3，再出 2，栈顶剩 1。')">检查</button>
+</div>
+<div aria-live="polite" class="feedback" id="fb-p1"></div>
+<div class="practice-actions">
+<button class="btn small" data-reveal="p1-solution">查看答案</button>
+<button class="btn small" data-reveal="p1-hint">查看提示</button>
+</div>
+<div class="hint" id="p1-hint">栈后进先出，pop 先从最后进的开始。</div>
+<div class="solution" id="p1-solution">答案是 <span class="mono">1</span>。</div>
+</div>
+
+<div class="practice-card">
+<div class="practice-meta"><span class="pill core">训练 2 · 程序输出</span><span class="pill">先序遍历</span></div>
+<h3>写出运行结果</h3>
+<p>一棵树：1 的孩子是 2、3；2 的孩子是 4、5。先序遍历输出是什么？</p>
+<div class="answer-row">
+<input type="text" data-save="p2-answer" placeholder="例如：1 2 4 5 3"/>
+<button class="btn small primary" onclick="checkExact('p2-answer', '1 2 4 5 3', 'fb-p2', '正确！先序 = 根 → 左 → 右。', '还不对。先访问根 1，再左子树（2→4→5），再右子树 3。')">检查</button>
+</div>
+<div aria-live="polite" class="feedback" id="fb-p2"></div>
+<div class="practice-actions">
+<button class="btn small" data-reveal="p2-solution">查看答案</button>
+<button class="btn small" data-reveal="p2-hint">查看提示</button>
+</div>
+<div class="hint" id="p2-hint">先序：根 → 左子树 → 右子树。</div>
+<div class="solution" id="p2-solution">输出 <span class="mono">1 2 4 5 3</span>。</div>
+</div>
+
+<div class="practice-card">
+<div class="practice-meta"><span class="pill core">训练 3 · 填空计算</span><span class="pill">BFS</span></div>
+<h3>写出运行结果</h3>
+<p>无向图：1 连接 2、3；2 连接 4；3 连接 5。BFS 从 1 出发，d[4]（1 到 4 的最短距离）是多少？</p>
+<div class="answer-row">
+<input type="text" data-save="p3-answer" placeholder="输入数值"/>
+<button class="btn small primary" onclick="checkNumeric('p3-answer', 2, 'fb-p3', '正确！1→2→4 两步到达。', '不对。1 到 4 要走 1→2→4，共 2 步。')">检查</button>
+</div>
+<div aria-live="polite" class="feedback" id="fb-p3"></div>
+<div class="practice-actions">
+<button class="btn small" data-reveal="p3-solution">查看答案</button>
+<button class="btn small" data-reveal="p3-hint">查看提示</button>
+</div>
+<div class="hint" id="p3-hint">d[1]=0，d[2]=d[3]=1，d[4]=d[2]+1。</div>
+<div class="solution" id="p3-solution">答案是 <span class="mono">2</span>。</div>
+</div>
+
+<h3>刷题清单：把数据结构用到赛场上</h3>
+<p>这 8 道题专门练「栈、队列、堆、二叉树、图遍历」：</p>
+<div class="oj-grid">
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P1443" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P1443</span></div>
+<h4>马的遍历</h4>
+<p>棋盘上马走到每个点的最少步数。</p>
+<p class="oj-why">为什么做：BFS 求最短路的经典棋盘题，8 个方向。</p>
+</a>
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P1996" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P1996</span></div>
+<h4>约瑟夫问题</h4>
+<p>报数出圈的顺序。</p>
+<p class="oj-why">为什么做：队列模拟环形报数，数据结构最经典的模拟题。</p>
+</a>
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P3378" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P3378</span></div>
+<h4>【模板】堆</h4>
+<p>优先队列的插入与取最小。</p>
+<p class="oj-why">为什么做：priority_queue 模板题，后面 Dijkstra 要用。</p>
+</a>
+<a class="oj-card" href="https://www.luogu.com.cn/problem/P1305" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge">洛谷</span><span class="oj-badge" style="background:var(--sage-soft);color:var(--sage-deep)">P1305</span></div>
+<h4>新二叉树</h4>
+<p>按先序输出二叉树。</p>
+<p class="oj-why">为什么做：二叉树存储 + 先序遍历，树的基础练习。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/5/C" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">5C</span></div>
+<h4>Longest Regular Bracket Sequence</h4>
+<p>最长合法括号子串。</p>
+<p class="oj-why">为什么做：栈的经典应用，理解「匹配」就用栈。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/797/C" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">797C</span></div>
+<h4>Minimal string</h4>
+<p>用栈构造字典序最小的结果。</p>
+<p class="oj-why">为什么做：栈 + 贪心的经典组合，含金量很高。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/939/A" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">939A</span></div>
+<h4>Love Triangle</h4>
+<p>判断图中是否存在长度为 3 的环。</p>
+<p class="oj-why">为什么做：图的基本遍历，为第11章图论热身。</p>
+</a>
+<a class="oj-card" href="https://codeforces.com/problemset/problem/1020/B" target="_blank" rel="noopener">
+<div class="oj-top"><span class="oj-badge cf">CF</span><span class="oj-badge cf">1020B</span></div>
+<h4>Badge</h4>
+<p>沿「指向」走，找出第一个被访问两次的点。</p>
+<p class="oj-why">为什么做：图遍历 + 模拟，理解 vis 数组的作用。</p>
+</a>
+</div>
+
+<h3>错因记录</h3>
+<p>今天做错的题、踩过的坑，写在这里。</p>
+<textarea data-save="mistake-log" placeholder="例：BFS 忘了标记已访问导致死循环；先序和后序搞反了……"></textarea>
+</section>
+
+<section class="lesson" data-section="finish" id="finish">
+<div class="section-top">
+<div>
+<p class="section-kicker">FINISH · 通关</p>
+<h2>今日通关总结</h2>
+<p class="lead">先闭卷完成下面两项，再看掌握度。</p>
+</div>
+<label class="complete-check"><input class="section-check" type="checkbox"/>本节完成</label>
+</div>
+
+<h3>要点自检</h3>
+<div class="checklist">
+<label class="check-item"><input type="checkbox" data-save-check="c1"/><span>我会用栈 push/pop/top，理解后进先出。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c2"/><span>我会用队列 push/front/pop，理解先进先出。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c3"/><span>我会用数组模拟链表（data + next）。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c4"/><span>我能写出二叉树的先序、中序、后序遍历。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c5"/><span>我会用 DFS 求连通块、BFS 求无权图最短路。</span></label>
+<label class="check-item"><input type="checkbox" data-save-check="c6"/><span>我已经在洛谷或 Codeforces 上 AC 了一道数据结构题。</span></label>
+</div>
+
+<h3>闭卷写出「方法口诀」</h3>
+<p>后进先出用 <strong><input type="text" data-save="finish-method" placeholder="一个字" style="display:inline-block;width:80px;min-height:38px;padding:6px 10px"/></strong>，先进先出用队列。</p>
+<button class="btn small primary" onclick="checkExact('finish-method', '栈', 'fb-method', '正确！后进先出用栈。', '答案是「栈」。')">检查</button>
+<div aria-live="polite" class="feedback" id="fb-method"></div>
+
+<h3>用一句话总结本章</h3>
+<textarea data-save="final-summary" placeholder="例：这章我把栈队列二叉树图串起来了，BFS 求最短路真好用……"></textarea>
+
+<div class="score-panel" style="margin-top:22px">
+<div class="card" style="display:grid;place-items:center;text-align:center">
+<div class="score-ring" id="scoreRing"><span id="scoreValue">0%</span></div>
+<p style="color:var(--muted);font-size:14px;margin:10px 0 0">本章掌握度 = 测验25% + 进度25% + 自检25% + 训练25%</p>
+</div>
+<div class="card">
+<h3 style="margin-top:0">当前水平</h3>
+<p id="levelText" style="font-size:18px;color:var(--ink-soft)">还没开始？完成上面的题目后这里会显示你的掌握度。</p>
+<div class="practice-actions">
+<button class="btn primary" id="exportBtn2" onclick="exportRecord()">导出学习记录</button>
+<button class="btn danger" onclick="resetAllProgress()">清空本页进度</button>
+</div>
+<p style="color:var(--muted);font-size:14px;margin-top:12px">提示：学习记录会保存成 txt 文件，方便你复盘。</p>
+</div>
+</div>
+</section>
+
+<footer>
+<p>本站内容为原创讲解与原创示例代码，知识体系参考《算法竞赛入门经典（第2版）》刘汝佳 著。</p>
+<p><a href="../../index.html">返回章节总览</a> · 上一章：<a href="../ch05/index.html">第5章 C++ 与 STL</a> · 下一章：<a href="../ch07/index.html">第7章 暴力求解法</a></p>
+</footer>
+</div>
+</main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<script src="../../assets/js/ch06.js"></script>
+<script src="../../assets/js/lesson.js"></script>
+</body>
+</html>
